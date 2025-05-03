@@ -23,23 +23,26 @@ public class ShowMaintenancePanel extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(carListPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        scrollPane.setPreferredSize(new Dimension(600, 400));
+        scrollPane.setPreferredSize(new Dimension(600, 700));
         add(scrollPane, BorderLayout.CENTER);
 
         try {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT campingcar_id, car_name from camping_car");
             System.out.println("SELECT campingcar_id, car_name from camping_car 실행");
-            
+
             while (rs.next()) {
                 int campingcar_id = rs.getInt("campingcar_id");
                 String carName = rs.getString("car_name");
 
                 JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                rowPanel.setPreferredSize(new Dimension(600, 40));
                 rowPanel.add(new JLabel("[" + campingcar_id + "] " + carName));
 
                 JButton selfBtn = new JButton("자체 정비 내역 보기");
+                selfBtn.setPreferredSize(new Dimension(180, 40));
                 JButton externalBtn = new JButton("외부 정비 내역 보기");
+                externalBtn.setPreferredSize(new Dimension(180, 40));
 
                 selfBtn.addActionListener(e -> showSelfMaintenance(campingcar_id));
                 externalBtn.addActionListener(e -> showExternalMaintenance(campingcar_id));
@@ -57,7 +60,7 @@ public class ShowMaintenancePanel extends JPanel {
 
     private void showSelfMaintenance(int campingcarId) {
         JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "자체 정비 내역", true);
-        dialog.setSize(600, 400);
+        dialog.setSize(800, 600);
         dialog.setLayout(new BorderLayout());
 
         JPanel contentPanel = new JPanel();
@@ -71,8 +74,10 @@ public class ShowMaintenancePanel extends JPanel {
             String query = "SELECT * FROM self_maintenance WHERE campingcar_id = " + campingcarId;
             System.out.println(query + " 실행");
             ResultSet rs = stmt.executeQuery(query);
+            boolean hasData = false;
 
             while (rs.next()) {
+                hasData = true;
                 int maintenanceId = rs.getInt("maintenance_id");
                 String date = rs.getString("date");
                 int duration = rs.getInt("duration");
@@ -89,6 +94,11 @@ public class ShowMaintenancePanel extends JPanel {
                 row.add(partButton);
                 contentPanel.add(row);
             }
+            if (!hasData) {
+                JLabel noDataLabel = new JLabel("정비 내역 없음");
+                noDataLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+                contentPanel.add(noDataLabel);
+            }
 
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "정비 내역 조회 실패: " + e.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
@@ -101,7 +111,7 @@ public class ShowMaintenancePanel extends JPanel {
 
     private void showExternalMaintenance(int campingcarId) {
         JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "외부 정비 내역", true);
-        dialog.setSize(600, 400);
+        dialog.setSize(800, 600);
         dialog.setLayout(new BorderLayout());
 
         JPanel contentPanel = new JPanel();
@@ -115,8 +125,10 @@ public class ShowMaintenancePanel extends JPanel {
             String query = "SELECT * FROM external_maintenance_request WHERE campingcar_id = " + campingcarId;
             System.out.println(query + " 실행");
             ResultSet rs = stmt.executeQuery(query);
+            boolean hasData = false;
 
             while (rs.next()) {
+                hasData = true;
                 int maintenanceId = rs.getInt("maintenance_id");
                 String date = rs.getString("maintenance_date");
                 int fee = rs.getInt("fee");
@@ -141,6 +153,12 @@ public class ShowMaintenancePanel extends JPanel {
                 contentPanel.add(row);
             }
 
+            if (!hasData) {
+                JLabel noDataLabel = new JLabel("정비 내역 없음");
+                noDataLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+                contentPanel.add(noDataLabel);
+            }
+
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "외부 정비 내역 조회 실패: " + e.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
@@ -149,7 +167,6 @@ public class ShowMaintenancePanel extends JPanel {
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
     }
-
 
     private void showPartDetail(int partId) {
         JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "부품 정보", true);
@@ -231,5 +248,4 @@ public class ShowMaintenancePanel extends JPanel {
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
     }
-
 }

@@ -18,7 +18,10 @@ public class ShowTablePanel extends JPanel {
 
         String[] tableNames = DBUtils.TABLE_COLUMNS.keySet().toArray(String[]::new);
         JComboBox<String> tableCombo = new JComboBox<>(tableNames);
+        tableCombo.setPreferredSize(new Dimension(200, 40));
+
         JButton searchBtn = new JButton("검색");
+        searchBtn.setPreferredSize(new Dimension(100, 40));
 
         JPanel topPanel = new JPanel(new FlowLayout());
         topPanel.add(tableCombo);
@@ -40,8 +43,7 @@ public class ShowTablePanel extends JPanel {
 
                 String[] columnNames = new String[columns.size()];
                 for (int i = 0; i < columns.size(); i++) {
-                    String col = columns.get(i);
-                    columnNames[i] = col;
+                    columnNames[i] = columns.get(i);
                 }
 
                 List<Object[]> rowList = new ArrayList<>();
@@ -50,7 +52,6 @@ public class ShowTablePanel extends JPanel {
                     for (int i = 0; i < columns.size(); i++) {
                         row[i] = rs.getObject(columnNames[i]);
                     }
-
                     rowList.add(row);
                 }
 
@@ -58,7 +59,13 @@ public class ShowTablePanel extends JPanel {
 
                 JTable table = new JTable(data, columnNames);
                 table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+                for (int i = 0; i < table.getColumnCount(); i++) {
+                    table.getColumnModel().getColumn(i).setPreferredWidth(150);
+                }
+
                 JScrollPane scrollPane = new JScrollPane(table);
+                scrollPane.setPreferredSize(new Dimension(1000, 500));
 
                 tablePanel.removeAll();
                 tablePanel.add(scrollPane, BorderLayout.CENTER);

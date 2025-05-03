@@ -1,9 +1,6 @@
 package ui;
 
-import ui.adminMenu.CrudPanel;
-import ui.adminMenu.DbInitPanel;
-import ui.adminMenu.ShowMaintenancePanel;
-import ui.adminMenu.ShowTablePanel;
+import ui.adminMenu.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,6 +21,15 @@ public class AdminPanel extends JPanel {
         JButton queryBtn = new JButton("SELECT 실행");
         JButton logoutBtn = new JButton("로그아웃");
 
+        // 버튼 크기 설정
+        Dimension btnSize = new Dimension(200, 60);
+        initBtn.setPreferredSize(btnSize);
+        crudBtn.setPreferredSize(btnSize);
+        tableViewBtn.setPreferredSize(btnSize);
+        maintenanceBtn.setPreferredSize(btnSize);
+        queryBtn.setPreferredSize(btnSize);
+        logoutBtn.setPreferredSize(btnSize);
+
         contentPanel = new JPanel();
         contentPanel.add(new JLabel("왼쪽 메뉴를 선택하세요."));
 
@@ -31,7 +37,7 @@ public class AdminPanel extends JPanel {
         crudBtn.addActionListener(e -> setContent(new CrudPanel(conn)));
         tableViewBtn.addActionListener(e -> setContent(new ShowTablePanel(conn)));
         maintenanceBtn.addActionListener(e -> setContent(new ShowMaintenancePanel(conn)));
-//        queryBtn.addActionListener(e -> setContent(new CustomQueryPanel(conn)));
+        queryBtn.addActionListener(e -> setContent(new CustomQueryPanel(conn)));
         logoutBtn.addActionListener(e -> {
             try {
                 conn.close();

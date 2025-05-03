@@ -25,9 +25,10 @@ public class CrudPanel extends JPanel {
         JButton deleteBtn = new JButton("DELETE");
         JButton updateBtn = new JButton("UPDATE");
 
-        insertBtn.setPreferredSize(new Dimension(150, 40));
-        deleteBtn.setPreferredSize(new Dimension(150, 40));
-        updateBtn.setPreferredSize(new Dimension(150, 40));
+        Dimension btnSize = new Dimension(200, 50);
+        insertBtn.setPreferredSize(btnSize);
+        deleteBtn.setPreferredSize(btnSize);
+        updateBtn.setPreferredSize(btnSize);
 
         insertBtn.addActionListener(e -> showInsertPanel());
         deleteBtn.addActionListener(e -> showDeletePanel());
@@ -41,7 +42,6 @@ public class CrudPanel extends JPanel {
 
         contentPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
         add(contentPanel, BorderLayout.CENTER);
-
     }
 
     private void showInsertPanel() {
@@ -51,8 +51,11 @@ public class CrudPanel extends JPanel {
 
         String[] tableNames = DBUtils.TABLE_COLUMNS.keySet().toArray(String[]::new);
         JComboBox<String> tableCombo = new JComboBox<>(tableNames);
+        tableCombo.setPreferredSize(new Dimension(200, 35));
 
         JButton nextBtn = new JButton("선택");
+        nextBtn.setPreferredSize(new Dimension(120, 35));
+
         nextBtn.addActionListener(e -> {
             String selectedTable = (String) tableCombo.getSelectedItem();
             List<String> columns = DBUtils.TABLE_COLUMNS.get(selectedTable);
@@ -68,12 +71,14 @@ public class CrudPanel extends JPanel {
             for (String column : columns) {
                 formPanel.add(new JLabel(column + ":"));
                 JTextField field = new JTextField();
+                field.setPreferredSize(new Dimension(300, 35));
                 formPanel.add(field);
                 fieldInputs.add(field);
             }
 
-            formPanel.add(new JLabel()); // 열 맞추기
+            formPanel.add(new JLabel());
             JButton submitBtn = new JButton("실행");
+            submitBtn.setPreferredSize(new Dimension(120, 35));
             submitBtn.addActionListener(e2 -> {
                 List<String> values = new ArrayList<>();
                 for (JTextField field : fieldInputs) {
@@ -94,9 +99,7 @@ public class CrudPanel extends JPanel {
             });
             formPanel.add(submitBtn);
 
-
             contentPanel.add(formPanel, BorderLayout.CENTER);
-
             contentPanel.revalidate();
             contentPanel.repaint();
         });
@@ -105,7 +108,6 @@ public class CrudPanel extends JPanel {
         contentPanel.add(label);
         contentPanel.add(tableCombo);
         contentPanel.add(nextBtn);
-
         contentPanel.revalidate();
         contentPanel.repaint();
     }
@@ -116,7 +118,9 @@ public class CrudPanel extends JPanel {
 
         String[] tableNames = DBUtils.TABLE_COLUMNS.keySet().toArray(String[]::new);
         JComboBox<String> tableCombo = new JComboBox<>(tableNames);
+        tableCombo.setPreferredSize(new Dimension(200, 35));
         JButton selectBtn = new JButton("선택");
+        selectBtn.setPreferredSize(new Dimension(120, 35));
 
         JPanel topPanel = new JPanel(new FlowLayout());
         topPanel.add(new JLabel("DELETE 할 테이블 선택"));
@@ -136,11 +140,13 @@ public class CrudPanel extends JPanel {
             for (String col : columns) {
                 formPanel.add(new JLabel(col + ":"));
                 JTextField field = new JTextField();
+                field.setPreferredSize(new Dimension(300, 35));
                 formPanel.add(field);
                 valueFields.add(field);
             }
 
             JButton deleteBtn = new JButton("삭제 실행");
+            deleteBtn.setPreferredSize(new Dimension(120, 35));
             deleteBtn.addActionListener(e2 -> {
                 List<String> values = new ArrayList<>();
                 for (JTextField field : valueFields) {
@@ -181,7 +187,9 @@ public class CrudPanel extends JPanel {
 
         String[] tableNames = DBUtils.TABLE_COLUMNS.keySet().toArray(String[]::new);
         JComboBox<String> tableCombo = new JComboBox<>(tableNames);
+        tableCombo.setPreferredSize(new Dimension(200, 35));
         JButton selectBtn = new JButton("선택");
+        selectBtn.setPreferredSize(new Dimension(120, 35));
 
         JPanel topPanel = new JPanel(new FlowLayout());
         topPanel.add(new JLabel("UPDATE 할 테이블 선택"));
@@ -201,11 +209,13 @@ public class CrudPanel extends JPanel {
             for (String col : columns) {
                 conditionPanel.add(new JLabel(col + ":"));
                 JTextField field = new JTextField();
+                field.setPreferredSize(new Dimension(300, 35));
                 conditionPanel.add(field);
                 conditionFields.add(field);
             }
 
             JButton nextBtn = new JButton("수정값 입력하기");
+            nextBtn.setPreferredSize(new Dimension(150, 35));
             conditionPanel.add(new JLabel());
             conditionPanel.add(nextBtn);
 
@@ -240,11 +250,13 @@ public class CrudPanel extends JPanel {
         for (String col : editableColumns) {
             formPanel.add(new JLabel(col + ":"));
             JTextField field = new JTextField();
+            field.setPreferredSize(new Dimension(300, 35));
             formPanel.add(field);
             updateFields.add(field);
         }
 
         JButton updateBtn = new JButton("수정하기");
+        updateBtn.setPreferredSize(new Dimension(120, 35));
         formPanel.add(new JLabel());
         formPanel.add(updateBtn);
 
@@ -267,7 +279,7 @@ public class CrudPanel extends JPanel {
 
             String query = createUpdateQuery(selectedTable, editableColumns, updateValues, columns, conditionValues);
 
-            try{
+            try {
                 Statement stmt = conn.createStatement();
                 int count = stmt.executeUpdate(query);
                 System.out.println(query);
@@ -279,28 +291,24 @@ public class CrudPanel extends JPanel {
         });
     }
 
+    // createInsertQuery, createDeleteQuery, createUpdateQuery는 그대로 유지
     private String createInsertQuery(String table, List<String> columns, List<String> inputs) {
         StringBuilder query = new StringBuilder("INSERT INTO ").append(table).append(" (");
-
         for (int i = 0; i < columns.size(); i++) {
             query.append(columns.get(i));
             if (i < columns.size() - 1) query.append(", ");
         }
         query.append(") VALUES (");
-
         for (int i = 0; i < inputs.size(); i++) {
             String column = columns.get(i);
             String value = inputs.get(i);
-
             if (DBUtils.NUMERIC_COLUMNS.contains(column)) {
                 query.append(value.isEmpty() ? " NULL" : value);
             } else {
                 query.append("'").append(value.replace("'", "''")).append("'");
             }
-
             if (i < columns.size() - 1) query.append(", ");
         }
-
         query.append(")");
         return query.toString();
     }
@@ -308,11 +316,9 @@ public class CrudPanel extends JPanel {
     private String createDeleteQuery(String table, List<String> columns, List<String> inputs) {
         StringBuilder query = new StringBuilder("DELETE FROM ").append(table);
         boolean hasCondition = false;
-
         for (int i = 0; i < columns.size(); i++) {
             String col = columns.get(i);
             String val = inputs.get(i).trim();
-
             if (!val.isEmpty()) {
                 if (!hasCondition) {
                     query.append(" WHERE ");
@@ -320,7 +326,6 @@ public class CrudPanel extends JPanel {
                 } else {
                     query.append(" AND ");
                 }
-
                 if (DBUtils.NUMERIC_COLUMNS.contains(col)) {
                     query.append(col).append(" = ").append(val);
                 } else {
@@ -328,14 +333,12 @@ public class CrudPanel extends JPanel {
                 }
             }
         }
-
         return query.toString();
     }
 
     private String createUpdateQuery(String table, List<String> updateCols, List<String> updateVals, List<String> condCols, List<String> condVals) {
         StringBuilder query = new StringBuilder("UPDATE ").append(table).append(" SET ");
         boolean hasUpdate = false;
-
         for (int i = 0; i < updateCols.size(); i++) {
             String col = updateCols.get(i);
             String val = updateVals.get(i);
@@ -371,7 +374,4 @@ public class CrudPanel extends JPanel {
 
         return query.toString();
     }
-
-
 }
-

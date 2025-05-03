@@ -11,7 +11,7 @@ public class DbInitPanel extends JPanel {
         setLayout(new FlowLayout(FlowLayout.CENTER, 0, 200));
 
         JButton initBtn = new JButton("DB 초기화 실행");
-        initBtn.setPreferredSize(new Dimension(200, 60));
+        initBtn.setPreferredSize(new Dimension(300, 80));
 
         initBtn.addActionListener(e -> {
             int choice = JOptionPane.showConfirmDialog(this,
@@ -19,7 +19,7 @@ public class DbInitPanel extends JPanel {
                     "확인",
                     JOptionPane.YES_NO_OPTION);
             if (choice == JOptionPane.YES_OPTION) {
-                try{
+                try {
                     DBInitializer.initialize();
                     DBInitializer.dataInsert();
 

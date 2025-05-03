@@ -6,7 +6,7 @@ import java.awt.*;
 public class UserLoginPanel extends JPanel {
 
     public UserLoginPanel(MainFrame frame) {
-        setLayout(new FlowLayout(FlowLayout.CENTER, 30, 200));
+        setLayout(new FlowLayout(FlowLayout.CENTER, 30, 250));
 
         JLabel idLabel = new JLabel("아이디:");
         JTextField idField = new JTextField();
@@ -17,10 +17,10 @@ public class UserLoginPanel extends JPanel {
         pwField.setPreferredSize(new Dimension(300, 40));
 
         JButton loginBtn = new JButton("로그인");
-        loginBtn.setPreferredSize(new Dimension(120, 40));
+        loginBtn.setPreferredSize(new Dimension(150, 50));
 
         JButton backBtn = new JButton("뒤로가기");
-        backBtn.setPreferredSize(new Dimension(120, 40));
+        backBtn.setPreferredSize(new Dimension(150, 50));
 
         backBtn.addActionListener(e -> frame.switchToPanel(frame.getMainPanel()));
 
