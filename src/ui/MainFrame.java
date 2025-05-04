@@ -16,9 +16,9 @@ public class MainFrame extends JFrame {
         setSize(1500, 800);
         setLocationRelativeTo(null);
 
-        mainPanel = createMainPanel();
+        mainPanel = createMainPanel(); // 로그아웃 할 때 이걸로 메인화면 돌아와야 함
 
-        setContentPane(createMainPanel());
+        setContentPane(createMainPanel()); // 메인화면 띄우기
 
         setVisible(true);
     }
@@ -33,10 +33,14 @@ public class MainFrame extends JFrame {
         userLoginBtn.setPreferredSize(new Dimension(250, 80));
 
         adminLoginBtn.addActionListener(e -> {
-            try{
+            try {
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "1234");
 
+                /**
+                 * 데이터베이스에 CAMPING 이라는 DATABASE가 있으면 conn 미리 연결 해놓고
+                 * 없으면 DB 초기화 하면서 DBInitializer 에서 use camping 선언 후 같은 conn 이용함
+                 */
                 if (databaseExists(conn)) {
                     Statement stmt = conn.createStatement();
                     stmt.execute("USE camping");
@@ -53,8 +57,26 @@ public class MainFrame extends JFrame {
         });
 
         userLoginBtn.addActionListener(e -> {
-            userLoginPanel = new UserLoginPanel(this);
-            switchToPanel(userLoginPanel);
+            try {
+                /**
+                 * ID : user1
+                 * password : user1
+                 * 아직 추가 안 함
+                 */
+                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "1234");
+
+                // conn 에 미리 use camping 선언 해놓기
+                if (databaseExists(conn)) {
+                    Statement stmt = conn.createStatement();
+                    stmt.execute("USE camping");
+                }
+
+                userLoginPanel = new UserLoginPanel(this, conn);
+                switchToPanel(userLoginPanel);
+            } catch (SQLException ex) {
+                System.out.println("SQL 실행오류");
+                ex.printStackTrace();
+            }
         });
 
         panel.add(adminLoginBtn);
@@ -64,7 +86,7 @@ public class MainFrame extends JFrame {
     }
 
     private boolean databaseExists(Connection conn) {
-        try{
+        try {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("SHOW DATABASES");
 

@@ -21,7 +21,6 @@ public class AdminPanel extends JPanel {
         JButton queryBtn = new JButton("SELECT 실행");
         JButton logoutBtn = new JButton("로그아웃");
 
-        // 버튼 크기 설정
         Dimension btnSize = new Dimension(200, 60);
         initBtn.setPreferredSize(btnSize);
         crudBtn.setPreferredSize(btnSize);
@@ -40,10 +39,11 @@ public class AdminPanel extends JPanel {
         queryBtn.addActionListener(e -> setContent(new CustomQueryPanel(conn)));
         logoutBtn.addActionListener(e -> {
             try {
-                conn.close();
+                conn.close(); // conn 반납
                 frame.switchToPanel(frame.getMainPanel());
             } catch (SQLException ex) {
-                throw new RuntimeException(ex);
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "로그아웃 실패: " + ex.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
             }
         });
 

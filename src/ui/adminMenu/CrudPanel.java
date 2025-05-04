@@ -80,6 +80,11 @@ public class CrudPanel extends JPanel {
             JButton submitBtn = new JButton("실행");
             submitBtn.setPreferredSize(new Dimension(120, 35));
             submitBtn.addActionListener(e2 -> {
+                int confirm = JOptionPane.showConfirmDialog(this, "정말 INSERT를 실행하시겠습니까?", "확인", JOptionPane.YES_NO_OPTION);
+                if (confirm != JOptionPane.YES_OPTION) {
+                    return;
+                }
+
                 List<String> values = new ArrayList<>();
                 for (JTextField field : fieldInputs) {
                     values.add(field.getText().trim());
@@ -148,6 +153,11 @@ public class CrudPanel extends JPanel {
             JButton deleteBtn = new JButton("삭제 실행");
             deleteBtn.setPreferredSize(new Dimension(120, 35));
             deleteBtn.addActionListener(e2 -> {
+                int confirm = JOptionPane.showConfirmDialog(this, "정말 DELETE를 실행하시겠습니까?", "확인", JOptionPane.YES_NO_OPTION);
+                if (confirm != JOptionPane.YES_OPTION) {
+                    return;
+                }
+
                 List<String> values = new ArrayList<>();
                 for (JTextField field : valueFields) {
                     values.add(field.getText().trim());
@@ -267,6 +277,11 @@ public class CrudPanel extends JPanel {
         contentPanel.repaint();
 
         updateBtn.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(this, "정말 UPDATE를 실행하시겠습니까?", "확인", JOptionPane.YES_NO_OPTION);
+            if (confirm != JOptionPane.YES_OPTION) {
+                return;
+            }
+
             List<String> updateValues = new ArrayList<>();
             for (JTextField field : updateFields) {
                 updateValues.add(field.getText());
@@ -291,7 +306,6 @@ public class CrudPanel extends JPanel {
         });
     }
 
-    // createInsertQuery, createDeleteQuery, createUpdateQuery는 그대로 유지
     private String createInsertQuery(String table, List<String> columns, List<String> inputs) {
         StringBuilder query = new StringBuilder("INSERT INTO ").append(table).append(" (");
         for (int i = 0; i < columns.size(); i++) {

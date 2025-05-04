@@ -1,11 +1,14 @@
 package ui;
 
+import db.Session;
+
 import javax.swing.*;
 import java.awt.*;
+import java.sql.*;
 
 public class UserLoginPanel extends JPanel {
 
-    public UserLoginPanel(MainFrame frame) {
+    public UserLoginPanel(MainFrame frame, Connection conn) {
         setLayout(new FlowLayout(FlowLayout.CENTER, 30, 250));
 
         JLabel idLabel = new JLabel("아이디:");
@@ -23,6 +26,38 @@ public class UserLoginPanel extends JPanel {
         backBtn.setPreferredSize(new Dimension(150, 50));
 
         backBtn.addActionListener(e -> frame.switchToPanel(frame.getMainPanel()));
+
+        loginBtn.addActionListener(e -> {
+            String id = idField.getText();
+            String pw = pwField.getText().trim();
+
+            if(id.isEmpty() || pw.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "아이디, 비밀번호를 모두 입력하세요.");
+                return;
+            }
+
+            try{
+                Statement stmt = conn.createStatement();
+                String query = "SELECT * FROM  customer WHERE login_id = ? AND password = ?";
+                PreparedStatement pstmt = conn.prepareStatement(query);
+                pstmt.setString(1, id);
+                pstmt.setString(2, pw);
+                System.out.println(query + " 실행");
+
+                ResultSet rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    // 나중에 대여 등록할 때 쓰려고 session 에 저장해놓기
+                    Session.currentCustomerId = rs.getInt("customer_id");
+                    JOptionPane.showMessageDialog(this, "환영합니다.");
+                    frame.switchToPanel(new UserPanel(frame, conn));
+                } else{
+                    JOptionPane.showMessageDialog(this, "아이디 또는 비밀번호가 일치하지 않습니다.");
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "로그인 실패: " + ex.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
+            }
+        });
 
         add(idLabel);
         add(idField);

@@ -44,6 +44,7 @@ public class ShowMaintenancePanel extends JPanel {
                 JButton externalBtn = new JButton("외부 정비 내역 보기");
                 externalBtn.setPreferredSize(new Dimension(180, 40));
 
+                // 버튼 누르면 다이얼로그로 볼 수 있게
                 selfBtn.addActionListener(e -> showSelfMaintenance(campingcar_id));
                 externalBtn.addActionListener(e -> showExternalMaintenance(campingcar_id));
 

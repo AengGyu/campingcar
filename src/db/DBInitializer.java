@@ -132,7 +132,7 @@ public class DBInitializer {
             Statement stmt = conn.createStatement();
 
             stmt.execute("CREATE SCHEMA IF NOT EXISTS camping DEFAULT CHARACTER SET utf8;");
-            stmt.execute("USE camping");
+            stmt.execute("USE camping"); // 데이터베이스에 camping이 없으면 여기서 use camping 선언 후 같은 conn 사용
 
             stmt.execute("DROP TABLE IF EXISTS external_maintenance_request");
             stmt.execute("DROP TABLE IF EXISTS external_maintenance_shop");

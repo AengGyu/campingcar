@@ -37,6 +37,12 @@ public class CustomQueryPanel extends JPanel {
                 return;
             }
 
+            int confirm = JOptionPane.showConfirmDialog(this, "정말 이 쿼리를 실행하시겠습니까?\n\n" + query, "쿼리 실행 확인", JOptionPane.YES_NO_OPTION);
+
+            if (confirm != JOptionPane.YES_OPTION) {
+                return;
+            }
+
             try {
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(query);
