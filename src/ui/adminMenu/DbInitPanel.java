@@ -5,6 +5,7 @@ import db.DBInitializer;
 import javax.swing.*;
 import java.awt.*;
 import java.sql.Connection;
+import java.sql.Statement;
 
 public class DbInitPanel extends JPanel {
     public DbInitPanel(Connection conn) {
@@ -20,8 +21,10 @@ public class DbInitPanel extends JPanel {
                     JOptionPane.YES_NO_OPTION);
             if (choice == JOptionPane.YES_OPTION) {
                 try {
-                    DBInitializer.initialize();
-                    DBInitializer.dataInsert();
+                    Statement stmt = conn.createStatement();
+                    DBInitializer.initialize(conn);
+                    DBInitializer.dataInsert(conn);
+//                    stmt.execute("USE camping");
 
                     JOptionPane.showMessageDialog(this, "초기화 완료");
                 } catch (Exception ex) {

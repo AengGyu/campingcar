@@ -2,9 +2,7 @@ package ui;
 
 import javax.swing.*;
 import java.awt.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class MainFrame extends JFrame {
 
@@ -15,13 +13,12 @@ public class MainFrame extends JFrame {
     public MainFrame() {
         setTitle("캠핑카 대여 시스템");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1200, 800);
+        setSize(1500, 800);
         setLocationRelativeTo(null);
 
         mainPanel = createMainPanel();
-        userLoginPanel = new UserLoginPanel(this);
 
-        setContentPane(mainPanel);
+        setContentPane(createMainPanel());
 
         setVisible(true);
     }
@@ -38,7 +35,12 @@ public class MainFrame extends JFrame {
         adminLoginBtn.addActionListener(e -> {
             try{
                 Class.forName("com.mysql.cj.jdbc.Driver");
-                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/camping", "root", "1234");
+                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "1234");
+
+                if (databaseExists(conn)) {
+                    Statement stmt = conn.createStatement();
+                    stmt.execute("USE camping");
+                }
                 adminPanel = new AdminPanel(this, conn);
                 switchToPanel(adminPanel);
             } catch (ClassNotFoundException ex) {
@@ -51,6 +53,7 @@ public class MainFrame extends JFrame {
         });
 
         userLoginBtn.addActionListener(e -> {
+            userLoginPanel = new UserLoginPanel(this);
             switchToPanel(userLoginPanel);
         });
 
@@ -58,6 +61,23 @@ public class MainFrame extends JFrame {
         panel.add(userLoginBtn);
 
         return panel;
+    }
+
+    private boolean databaseExists(Connection conn) {
+        try{
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SHOW DATABASES");
+
+            while (rs.next()) {
+                if (rs.getString(1).equalsIgnoreCase("camping")) {
+                    return true;
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "오류 발생");
+        }
+        return false;
     }
 
     public void switchToPanel(JPanel panel) {

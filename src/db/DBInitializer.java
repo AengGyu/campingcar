@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DBInitializer {
-    public static void initialize() {
+    public static void initialize(Connection conn) {
         String[] ddl = {
                 "CREATE TABLE IF NOT EXISTS rent_company (\n" +
                         "  company_id INT NOT NULL AUTO_INCREMENT,\n" +
@@ -129,7 +129,6 @@ public class DBInitializer {
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "1234");
             Statement stmt = conn.createStatement();
 
             stmt.execute("CREATE SCHEMA IF NOT EXISTS camping DEFAULT CHARACTER SET utf8;");
@@ -160,7 +159,7 @@ public class DBInitializer {
         }
     }
 
-    public static void dataInsert() {
+    public static void dataInsert(Connection conn) {
         String[] rentCompany = {
                 "INSERT INTO rent_company (company_name, address, phone, manager_name, manager_email) VALUES ('롯데렌터카', '서울특별시 강남구 테헤란로 123번길 45', '010-1111-1111', '김민수', 'minsu.kim@lottemobility.co.kr')",
                 "INSERT INTO rent_company (company_name, address, phone, manager_name, manager_email) VALUES ('SK렌터카', '부산광역시 해운대구 해운대해변로 197번길 22', '010-1111-1112', '이지은', 'jieun.lee@skrentcar.com')",
@@ -314,7 +313,6 @@ public class DBInitializer {
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/camping", "root", "1234");
             Statement stmt = conn.createStatement();
 
             for (String query : rentCompany) {
