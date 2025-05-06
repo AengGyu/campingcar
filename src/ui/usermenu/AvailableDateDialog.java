@@ -47,14 +47,22 @@ public class AvailableDateDialog extends JDialog {
         }
 
         JButton rentBtn = new JButton("대여하기");
+        JButton cancelBtn = new JButton("취소");
+
         rentBtn.addActionListener(e -> {
             // 대여하기 버튼을 누르면 현재 다이얼로그 dispose 하고 예약 정보 입력 받는 다이얼로그 띄우기
-            dispose();
-            new RentCampingcarDialog(owner, conn, campingcarId, availableDate[0]);
+            int result = JOptionPane.showConfirmDialog(this, "대여하시겠습니까?", "대여 확인", JOptionPane.YES_NO_OPTION);
+            if (result == JOptionPane.YES_OPTION) {
+                dispose();
+                new RentCampingcarDialog(owner, conn, campingcarId, availableDate[0]);
+            }
         });
+
+        cancelBtn.addActionListener(e -> dispose());
 
         JPanel btnPanel = new JPanel();
         btnPanel.add(rentBtn);
+        btnPanel.add(cancelBtn);
         add(btnPanel, BorderLayout.SOUTH);
 
         setSize(400, 200);

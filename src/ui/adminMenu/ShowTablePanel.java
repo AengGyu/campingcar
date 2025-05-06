@@ -4,13 +4,18 @@ import db.DBUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ShowTablePanel extends JPanel {
 
+    private Connection conn;
+
     public ShowTablePanel(Connection conn) {
+        this.conn = conn;
         setLayout(new BorderLayout());
 
         JLabel label = new JLabel("테이블을 선택하세요.", SwingConstants.CENTER);
@@ -38,6 +43,7 @@ public class ShowTablePanel extends JPanel {
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT * FROM " + selectedTable);
                 System.out.println("SELECT * FROM " + selectedTable);
+
                 List<String> columns = new ArrayList<>(DBUtils.TABLE_COLUMNS.get(selectedTable));
                 columns.add(0, DBUtils.PRIMARY_KEYS.get(selectedTable));
 
@@ -50,7 +56,13 @@ public class ShowTablePanel extends JPanel {
                 while (rs.next()) {
                     Object[] row = new Object[columns.size()];
                     for (int i = 0; i < columns.size(); i++) {
-                        row[i] = rs.getObject(columnNames[i]);
+                        String colName = columns.get(i);
+                        if (selectedTable.equalsIgnoreCase("camping_car") && colName.equalsIgnoreCase("image")) {
+                            Blob blob = rs.getBlob("image");
+                            row[i] = (blob != null && blob.length() > 0) ? "이미지 보기" : "이미지 없음";
+                        } else {
+                            row[i] = rs.getObject(columnNames[i]);
+                        }
                     }
                     rowList.add(row);
                 }
@@ -71,10 +83,48 @@ public class ShowTablePanel extends JPanel {
                 tablePanel.add(scrollPane, BorderLayout.CENTER);
                 tablePanel.revalidate();
                 tablePanel.repaint();
+
+                if (selectedTable.equalsIgnoreCase("camping_car")) {
+                    table.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            int row = table.rowAtPoint(e.getPoint());
+                            int col = table.columnAtPoint(e.getPoint());
+                            if (row == -1 || col == -1) return;
+
+                            String colName = table.getColumnName(col);
+                            if (colName.equalsIgnoreCase("image")) {
+                                int campingcarId = Integer.parseInt(table.getValueAt(row, 0).toString());
+                                showImageDialog(campingcarId);
+                            }
+                        }
+                    });
+                }
             } catch (SQLException ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(this, "조회 실패: " + ex.getMessage());
             }
         });
+    }
+
+    private void showImageDialog(int campingcarId) {
+        try (PreparedStatement pstmt = conn.prepareStatement(
+                "SELECT image FROM camping_car WHERE campingcar_id = ?")) {
+            pstmt.setInt(1, campingcarId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                byte[] imageBytes = rs.getBytes("image");
+                if (imageBytes != null) {
+                    ImageIcon icon = new ImageIcon(imageBytes);
+                    JLabel imgLabel = new JLabel(icon);
+                    JOptionPane.showMessageDialog(this, imgLabel, "캠핑카 이미지", JOptionPane.PLAIN_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this, "이미지가 없습니다.", "알림", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "이미지 로딩 실패: " + ex.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }

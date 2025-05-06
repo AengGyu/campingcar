@@ -6,19 +6,20 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ShowCampingcarPanel extends JPanel {
 
-    public ShowCampingcarPanel(Connection conn) {
+    private Connection conn;
 
+    public ShowCampingcarPanel(Connection conn) {
+        this.conn = conn;
         setLayout(new BorderLayout());
+
         JLabel label = new JLabel("캠핑카 목록");
+        label.setHorizontalAlignment(SwingConstants.CENTER);
         add(label, BorderLayout.NORTH);
 
         String tableName = "CAMPING_CAR";
@@ -40,7 +41,14 @@ public class ShowCampingcarPanel extends JPanel {
             while (rs.next()) {
                 Object[] row = new Object[columnNames.length];
                 for (int i = 0; i < columnNames.length; i++) {
-                    row[i] = rs.getObject(columnNames[i]);
+                    String colName = columnNames[i];
+                    if (colName.equalsIgnoreCase("image")) {
+                        Blob blob = rs.getBlob(colName);
+                        row[i] = (blob != null && blob.length() > 0) ? "이미지 보기" : "이미지 없음";
+                    } else {
+                        row[i] = rs.getObject(columnNames[i]);
+                    }
+
                 }
                 rows.add(row);
             }
@@ -61,10 +69,16 @@ public class ShowCampingcarPanel extends JPanel {
             table.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    int row = table.getSelectedRow();
-                    if (row != -1) {
-                        int campingcarId = Integer.parseInt(table.getValueAt(row, 0).toString());
-                        // 대여 가능 일자를 보여주는 다이얼로그 띄우기
+                    int row = table.rowAtPoint(e.getPoint());
+                    int col = table.columnAtPoint(e.getPoint());
+                    if (row == -1 || col == -1) return;
+
+                    String colName = table.getColumnName(col);
+                    int campingcarId = Integer.parseInt(table.getValueAt(row, 0).toString());
+
+                    if (colName.equalsIgnoreCase("image")) {
+                        showImageDialog(campingcarId);
+                    } else {
                         new AvailableDateDialog((Frame) SwingUtilities.getWindowAncestor(ShowCampingcarPanel.this), campingcarId, conn);
                     }
                 }
@@ -73,6 +87,26 @@ public class ShowCampingcarPanel extends JPanel {
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "캠핑카 목록 조회 실패: " + e.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void showImageDialog(int campingcarId) {
+        try (PreparedStatement pstmt = conn.prepareStatement("SELECT image FROM camping_car WHERE campingcar_id = ?")) {
+            pstmt.setInt(1, campingcarId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                byte[] imageBytes = rs.getBytes("image");
+                if (imageBytes != null) {
+                    ImageIcon icon = new ImageIcon(imageBytes);
+                    JLabel imgLabel = new JLabel(icon);
+                    JOptionPane.showMessageDialog(this, imgLabel, "캠핑카 이미지", JOptionPane.PLAIN_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this, "이미지가 없습니다.", "알림", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "이미지 로딩 실패: " + ex.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

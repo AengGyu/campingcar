@@ -1,5 +1,5 @@
 package db;
 
 public class Session {
-    public static int currentCustomerId;
+    public static String currentCustomerDriverLicense;
 }

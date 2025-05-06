@@ -62,6 +62,9 @@ public class MainFrame extends JFrame {
                  * ID : user1
                  * password : user1
                  * 아직 추가 안 함
+                 *
+                 * root 로 로그인까지 하고 나중에 conn 반납하고 user 로 다시 로그인 하기?
+                 * session 에 저장해야 되는데 user는 customer 테이블 접근을 못함
                  */
                 Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "1234");
 
@@ -85,7 +88,7 @@ public class MainFrame extends JFrame {
         return panel;
     }
 
-    private boolean databaseExists(Connection conn) {
+    public boolean databaseExists(Connection conn) {
         try {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("SHOW DATABASES");

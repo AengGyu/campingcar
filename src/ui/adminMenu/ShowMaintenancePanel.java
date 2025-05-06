@@ -106,6 +106,12 @@ public class ShowMaintenancePanel extends JPanel {
             e.printStackTrace();
         }
 
+        JButton closeBtn = new JButton("닫기");
+        closeBtn.addActionListener(e -> dialog.dispose());
+        JPanel btnPanel = new JPanel();
+        btnPanel.add(closeBtn);
+        dialog.add(btnPanel, BorderLayout.SOUTH);
+
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
     }
@@ -164,6 +170,13 @@ public class ShowMaintenancePanel extends JPanel {
             JOptionPane.showMessageDialog(this, "외부 정비 내역 조회 실패: " + e.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
+
+        JButton closeBtn = new JButton("닫기");
+        closeBtn.addActionListener(e -> dialog.dispose());
+        JPanel btnPanel = new JPanel();
+        btnPanel.add(closeBtn);
+        dialog.add(btnPanel, BorderLayout.SOUTH);
+
 
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);

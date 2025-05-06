@@ -97,6 +97,7 @@ public class CrudPanel extends JPanel {
                     stmt.executeUpdate(query);
                     System.out.println(query + " 실행");
                     JOptionPane.showMessageDialog(this, "데이터 삽입 성공");
+                    showInsertPanel();
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(this, "삽입 실패: " + ex.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
                     ex.printStackTrace();
@@ -170,6 +171,7 @@ public class CrudPanel extends JPanel {
                     int count = stmt.executeUpdate(query);
                     System.out.println(query);
                     JOptionPane.showMessageDialog(this, count + "개 행 삭제 완료");
+                    showDeletePanel();
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(this, "삭제 실패: " + ex.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
@@ -299,6 +301,7 @@ public class CrudPanel extends JPanel {
                 int count = stmt.executeUpdate(query);
                 System.out.println(query);
                 JOptionPane.showMessageDialog(this, count + "개 행 수정 완료");
+                showUpdatePanel();
             } catch (SQLException ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(this, "수정 실패: " + ex.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);

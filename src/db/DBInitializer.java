@@ -1,9 +1,11 @@
 package db;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.*;
+
+import static java.sql.Types.BLOB;
 
 public class DBInitializer {
     public static void initialize(Connection conn) {
@@ -29,7 +31,7 @@ public class DBInitializer {
                         "  registration_date DATE NOT NULL,\n" +
                         "  company_id INT NOT NULL,\n" +
                         "  PRIMARY KEY (campingcar_id),\n" +
-                        "  FOREIGN KEY (company_id) REFERENCES rent_company(company_id)\n" +
+                        "  FOREIGN KEY (company_id) REFERENCES rent_company(company_id) ON DELETE CASCADE\n" +
                         ")",
 
                 "CREATE TABLE IF NOT EXISTS parts (\n" +
@@ -62,9 +64,9 @@ public class DBInitializer {
                         "  part_id INT NOT NULL,\n" +
                         "  employee_id INT NOT NULL,\n" +
                         "  PRIMARY KEY (maintenance_id),\n" +
-                        "  FOREIGN KEY (campingcar_id) REFERENCES camping_car(campingcar_id),\n" +
-                        "  FOREIGN KEY (part_id) REFERENCES parts(part_id),\n" +
-                        "  FOREIGN KEY (employee_id) REFERENCES employee(employee_id)\n" +
+                        "  FOREIGN KEY (campingcar_id) REFERENCES camping_car(campingcar_id) ON DELETE CASCADE,\n" +
+                        "  FOREIGN KEY (part_id) REFERENCES parts(part_id) ON DELETE CASCADE,\n" +
+                        "  FOREIGN KEY (employee_id) REFERENCES employee(employee_id) ON DELETE CASCADE\n" +
                         ")",
 
                 "CREATE TABLE IF NOT EXISTS customer (\n" +
@@ -93,9 +95,9 @@ public class DBInitializer {
                         "  company_id INT NOT NULL,\n" +
                         "  driver_license VARCHAR(45) NOT NULL,\n" +
                         "  PRIMARY KEY (rental_id),\n" +
-                        "  FOREIGN KEY (campingcar_id) REFERENCES camping_car(campingcar_id),\n" +
-                        "  FOREIGN KEY (company_id) REFERENCES rent_company(company_id),\n" +
-                        "  FOREIGN KEY (driver_license) REFERENCES customer(driver_license)\n" +
+                        "  FOREIGN KEY (campingcar_id) REFERENCES camping_car(campingcar_id) ON DELETE CASCADE,\n" +
+                        "  FOREIGN KEY (company_id) REFERENCES rent_company(company_id) ON DELETE CASCADE,\n" +
+                        "  FOREIGN KEY (driver_license) REFERENCES customer(driver_license) ON DELETE CASCADE\n" +
                         ")",
 
                 "CREATE TABLE IF NOT EXISTS external_maintenance_shop (\n" +
@@ -120,10 +122,10 @@ public class DBInitializer {
                         "  company_id INT NOT NULL,\n" +
                         "  driver_license VARCHAR(45) NOT NULL,\n" +
                         "  PRIMARY KEY (maintenance_id),\n" +
-                        "  FOREIGN KEY (campingcar_id) REFERENCES camping_car(campingcar_id),\n" +
-                        "  FOREIGN KEY (shop_id) REFERENCES external_maintenance_shop(shop_id),\n" +
-                        "  FOREIGN KEY (company_id) REFERENCES rent_company(company_id),\n" +
-                        "  FOREIGN KEY (driver_license) REFERENCES customer(driver_license)\n" +
+                        "  FOREIGN KEY (campingcar_id) REFERENCES camping_car(campingcar_id) ON DELETE CASCADE,\n" +
+                        "  FOREIGN KEY (shop_id) REFERENCES external_maintenance_shop(shop_id) ON DELETE CASCADE,\n" +
+                        "  FOREIGN KEY (company_id) REFERENCES rent_company(company_id) ON DELETE CASCADE,\n" +
+                        "  FOREIGN KEY (driver_license) REFERENCES customer(driver_license) ON DELETE CASCADE\n" +
                         ")"
         };  // 렌트카 사진 NOT NULL 결정해야됨, 테스트할 땐 일단 null 허용해놓고
 
@@ -150,6 +152,12 @@ public class DBInitializer {
 
             System.out.println("DB 초기화 완료");
 
+            stmt.execute("CREATE USER IF NOT EXISTS 'user1'@'localhost' IDENTIFIED BY 'user1'");
+            stmt.execute("GRANT SELECT, INSERT, UPDATE ON camping.camping_car TO 'user1'@'localhost'");
+            stmt.execute("GRANT SELECT, INSERT, UPDATE, DELETE ON camping.rental TO 'user1'@'localhost'");
+            stmt.execute("GRANT SELECT, INSERT, UPDATE ON camping.external_maintenance_request TO 'user1'@'localhost'");
+            System.out.println("MYSQL 계정 생성: ID: user1, PASSWORD: user1");
+
         } catch (ClassNotFoundException e) {
             System.out.println("JDBC 드라이버 로드 오류");
             e.printStackTrace();
@@ -157,6 +165,9 @@ public class DBInitializer {
             System.out.println("SQL 실행오류");
             e.printStackTrace();
         }
+    }
+
+    public DBInitializer() {
     }
 
     public static void dataInsert(Connection conn) {
@@ -175,31 +186,31 @@ public class DBInitializer {
                 "INSERT INTO rent_company (company_name, address, phone, manager_name, manager_email) VALUES ('넥스트라이드', '제주특별자치도 제주시 연동로 789번길 78', '010-1111-1122', '류지민', 'jimin.ryu@nextride.co.kr')"
         };
 
-        String[] campingCar = {
-                "INSERT INTO camping_car (car_name, car_number, capacity, image, car_detail, rental_fee, registration_date, company_id) VALUES ('프리로드', '서울32가1234', 4, '/images/staria_camper.jpg', '4인 취침, 주방(싱크대, 냉장고), 샤워실, 2.2L 디젤', 120000, '2024-03-15', 1)",
-                "INSERT INTO camping_car (car_name, car_number, capacity, image, car_detail, rental_fee, registration_date, company_id) VALUES ('윈드밴', '부산17나5678', 3, '/images/ray_camper.jpg', '3인 취침, 소형 주방, 루프탑 텐트, 1.0L 가솔린', 95000, '2024-02-20', 2)",
-                "INSERT INTO camping_car (car_name, car_number, capacity, image, car_detail, rental_fee, registration_date, company_id) VALUES ('스타캠프', '대구88다9012', 5, '/images/colorado_camper.jpg', '5인 취침, 야외 샤워, 태양광 패널, 3.6L 가솔린', 140000, '2024-04-10', 3)",
-                "INSERT INTO camping_car (car_name, car_number, capacity, image, car_detail, rental_fee, registration_date, company_id) VALUES ('트레일러너', '인천22라3456', 4, '/images/master_camper.jpg', '4인 취침, 주방(가스레인지), 화장실, 2.3L 디젤', 130000, '2024-01-25', 4)",
-                "INSERT INTO camping_car (car_name, car_number, capacity, image, car_detail, rental_fee, registration_date, company_id) VALUES ('로밍홈', '광주44마7890', 3, '/images/rexton_camper.jpg', '3인 취침, 접이식 테이블, 외부 오닝, 2.2L 디젤', 110000, '2024-05-05', 5)",
-                "INSERT INTO camping_car (car_name, car_number, capacity, image, car_detail, rental_fee, registration_date, company_id) VALUES ('아웃도어', '대전66바1234', 4, '/images/jeju_campvan.jpg', '4인 취침, 소형 주방, 루프탑 캐리어, 2.0L 디젤', 100000, '2024-03-30', 6)",
-                "INSERT INTO camping_car (car_name, car_number, capacity, image, car_detail, rental_fee, registration_date, company_id) VALUES ('글램퍼', '울산77사5678', 5, '/images/star_mobilehome.jpg', '5인 취침, 대형 냉장고, 샤워실, 3.0L 디젤', 150000, '2024-06-12', 7)",
-                "INSERT INTO camping_car (car_name, car_number, capacity, image, car_detail, rental_fee, registration_date, company_id) VALUES ('블루트립', '경기99아9012', 4, '/images/bluedrive_van.jpg', '4인 취침, 전기차 기반, 태양광 충전, 100kW 전기모터', 160000, '2024-07-01', 8)",
-                "INSERT INTO camping_car (car_name, car_number, capacity, image, car_detail, rental_fee, registration_date, company_id) VALUES ('이지캠퍼', '강원33자3456', 3, '/images/easy_campcar.jpg', '3인 취침, 컴팩트 주방, 접이식 침대, 1.5L 가솔린', 90000, '2024-02-15', 9)",
-                "INSERT INTO camping_car (car_name, car_number, capacity, image, car_detail, rental_fee, registration_date, company_id) VALUES ('모션밴', '전북55차7890', 4, '/images/motion_traveler.jpg', '4인 취침, 화장실, 외부 BBQ 공간, 2.5L 디젤', 125000, '2024-04-20', 10)",
-                "INSERT INTO camping_car (car_name, car_number, capacity, image, car_detail, rental_fee, registration_date, company_id) VALUES ('트립스타', '경남88카1234', 5, '/images/tripmate_rv.jpg', '5인 취침, 주방(전자레인지), TV, 3.2L 디젤', 145000, '2024-05-25', 11)",
-                "INSERT INTO camping_car (car_name, car_number, capacity, image, car_detail, rental_fee, registration_date, company_id) VALUES ('넥스트밴', '제주99타5678', 4, '/images/nextride_camper.jpg', '4인 취침, 루프탑 텐트, 샤워실, 2.4L 디젤', 135000, '2024-06-30', 12)",
-                "INSERT INTO camping_car (car_name, car_number, capacity, image, car_detail, rental_fee, registration_date, company_id) VALUES ('어반트레일', '서울78라9012', 4, '/images/urbantrail.jpg', '4인 취침, 주방(싱크대, 전자레인지), 샤워실, 2.4L 디젤', 125000, '2024-09-12', 1)",
-                "INSERT INTO camping_car (car_name, car_number, capacity, image, car_detail, rental_fee, registration_date, company_id) VALUES ('코스트밴', '부산56마3456', 3, '/images/coastvan.jpg', '3인 취침, 소형 주방, 루프탑 텐트, 1.6L 가솔린', 92000, '2024-08-18', 2)",
-                "INSERT INTO camping_car (car_name, car_number, capacity, image, car_detail, rental_fee, registration_date, company_id) VALUES ('리버캠퍼', '대구23바7890', 5, '/images/rivercamper.jpg', '5인 취침, 대형 오닝, 화장실, 3.2L 디젤', 145000, '2024-10-05', 3)",
-                "INSERT INTO camping_car (car_name, car_number, capacity, image, car_detail, rental_fee, registration_date, company_id) VALUES ('브리즈로버', '인천45사1234', 4, '/images/breezerover.jpg', '4인 취침, 주방(가스레인지), 루프탑 캐리어, 2.3L 디젤', 130000, '2024-07-22', 4)",
-                "INSERT INTO camping_car (car_name, car_number, capacity, image, car_detail, rental_fee, registration_date, company_id) VALUES ('메도우밴', '광주67아5678', 3, '/images/meadowvan.jpg', '3인 취침, 접이식 테이블, 외부 샤워, 1.5L 가솔린', 90000, '2024-11-08', 5)",
-                "INSERT INTO camping_car (car_name, car_number, capacity, image, car_detail, rental_fee, registration_date, company_id) VALUES ('오름캠퍼', '제주89타9012', 4, '/images/ormcamper.jpg', '4인 취침, 소형 주방, 샤워실, 2.0L 디젤', 115000, '2024-09-25', 6)",
-                "INSERT INTO camping_car (car_name, car_number, capacity, image, car_detail, rental_fee, registration_date, company_id) VALUES ('나이트스타', '울산12자3456', 5, '/images/nightstar.jpg', '5인 취침, 대형 냉장고, 화장실, 3.0L 디젤', 150000, '2024-06-28', 7)",
-                "INSERT INTO camping_car (car_name, car_number, capacity, image, car_detail, rental_fee, registration_date, company_id) VALUES ('솔라트립', '경기34카7890', 4, '/images/solartrip.jpg', '4인 취침, 전기차 기반, 태양광 충전, 100kW 전기모터', 160000, '2024-12-03', 8)",
-                "INSERT INTO camping_car (car_name, car_number, capacity, image, car_detail, rental_fee, registration_date, company_id) VALUES ('스트림캠프', '강원56하1234', 3, '/images/streamcamp.jpg', '3인 취침, 컴팩트 주방, 접이식 침대, 1.4L 가솔린', 91000, '2024-08-05', 9)",
-                "INSERT INTO camping_car (car_name, car_number, capacity, image, car_detail, rental_fee, registration_date, company_id) VALUES ('모빌로밍', '전북78파5678', 4, '/images/mobileroaming.jpg', '4인 취침, 외부 BBQ 공간, 샤워실, 2.5L 디젤', 128000, '2024-10-15', 10)",
-                "INSERT INTO camping_car (car_name, car_number, capacity, image, car_detail, rental_fee, registration_date, company_id) VALUES ('패스파인더', '경남90타9012', 5, '/images/pathfinder.jpg', '5인 취침, 주방(전자레인지), TV, 3.2L 디젤', 148000, '2024-07-10', 11)",
-                "INSERT INTO camping_car (car_name, car_number, capacity, image, car_detail, rental_fee, registration_date, company_id) VALUES ('코럴로버', '제주12파3456', 4, '/images/coralrover.jpg', '4인 취침, 루프탑 텐트, 샤워실, 2.4L 디젤', 132000, '2024-11-20', 12)"
+        Object[][] campingcar = {
+                {"프리로드", "서울32가1234", 4, "images/campingcar1.jpg", "4인 취침, 주방(싱크대, 냉장고), 샤워실, 2.2L 디젤", 120000, "2024-03-15", 1},
+                {"윈드밴", "부산17나5678", 3, "images/campingcar2.jpg", "3인 취침, 소형 주방, 루프탑 텐트, 1.0L 가솔린", 95000, "2024-02-20", 2},
+                {"스타캠프", "대구88다9012", 5, "images/campingcar3.jpg", "5인 취침, 야외 샤워, 태양광 패널, 3.6L 가솔린", 140000, "2024-04-10", 3},
+                {"트레일러너", "인천22라3456", 4, "images/campingcar4.jpg", "4인 취침, 주방(가스레인지), 화장실, 2.3L 디젤", 130000, "2024-01-25", 4},
+                {"로밍홈", "광주44마7890", 3, "images/campingcar1.jpg", "3인 취침, 접이식 테이블, 외부 오닝, 2.2L 디젤", 110000, "2024-05-05", 5},
+                {"아웃도어", "대전66바1234", 4, "images/campingcar2.jpg", "4인 취침, 소형 주방, 루프탑 캐리어, 2.0L 디젤", 100000, "2024-03-30", 6},
+                {"글램퍼", "울산77사5678", 5, "images/campingcar3.jpg", "5인 취침, 대형 냉장고, 샤워실, 3.0L 디젤", 150000, "2024-06-12", 7},
+                {"블루트립", "경기99아9012", 4, "images/campingcar4.jpg", "4인 취침, 전기차 기반, 태양광 충전, 100kW 전기모터", 160000, "2024-07-01", 8},
+                {"이지캠퍼", "강원33자3456", 3, "images/campingcar1.jpg", "3인 취침, 컴팩트 주방, 접이식 침대, 1.5L 가솔린", 90000, "2024-02-15", 9},
+                {"모션밴", "전북55차7890", 4, "images/campingcar2.jpg", "4인 취침, 화장실, 외부 BBQ 공간, 2.5L 디젤", 125000, "2024-04-20", 10},
+                {"트립스타", "경남88카1234", 5, "images/campingcar3.jpg", "5인 취침, 주방(전자레인지), TV, 3.2L 디젤", 145000, "2024-05-25", 11},
+                {"넥스트밴", "제주99타5678", 4, "images/campingcar4.jpg", "4인 취침, 루프탑 텐트, 샤워실, 2.4L 디젤", 135000, "2024-06-30", 12},
+                {"어반트레일", "서울78라9012", 4, "images/campingcar1.jpg", "4인 취침, 주방(싱크대, 전자레인지), 샤워실, 2.4L 디젤", 125000, "2024-09-12", 1},
+                {"코스트밴", "부산56마3456", 3, "images/campingcar2.jpg", "3인 취침, 소형 주방, 루프탑 텐트, 1.6L 가솔린", 92000, "2024-08-18", 2},
+                {"리버캠퍼", "대구23바7890", 5, "images/campingcar3.jpg", "5인 취침, 대형 오닝, 화장실, 3.2L 디젤", 145000, "2024-10-05", 3},
+                {"브리즈로버", "인천45사1234", 4, "images/campingcar4.jpg", "4인 취침, 주방(가스레인지), 루프탑 캐리어, 2.3L 디젤", 130000, "2024-07-22", 4},
+                {"메도우밴", "광주67아5678", 3, "images/campingcar1.jpg", "3인 취침, 접이식 테이블, 외부 샤워, 1.5L 가솔린", 90000, "2024-11-08", 5},
+                {"오름캠퍼", "제주89타9012", 4, "images/campingcar2.jpg", "4인 취침, 소형 주방, 샤워실, 2.0L 디젤", 115000, "2024-09-25", 6},
+                {"나이트스타", "울산12자3456", 5, "images/campingcar3.jpg", "5인 취침, 대형 냉장고, 화장실, 3.0L 디젤", 150000, "2024-06-28", 7},
+                {"솔라트립", "경기34카7890", 4, "images/campingcar4.jpg", "4인 취침, 전기차 기반, 태양광 충전, 100kW 전기모터", 160000, "2024-12-03", 8},
+                {"스트림캠프", "강원56하1234", 3, "images/campingcar1.jpg", "3인 취침, 컴팩트 주방, 접이식 침대, 1.4L 가솔린", 91000, "2024-08-05", 9},
+                {"모빌로밍", "전북78파5678", 4, "images/campingcar2.jpg", "4인 취침, 외부 BBQ 공간, 샤워실, 2.5L 디젤", 128000, "2024-10-15", 10},
+                {"패스파인더", "경남90타9012", 5, "images/campingcar3.jpg", "5인 취침, 주방(전자레인지), TV, 3.2L 디젤", 148000, "2024-07-10", 11},
+                {"코럴로버", "제주12파3456", 4, "images/campingcar5.jpg", "4인 취침, 루프탑 텐트, 샤워실, 2.4L 디젤", 132000, "2024-11-20", 12}
         };
 
         String[] customer = {
@@ -216,7 +227,6 @@ public class DBInitializer {
                 "INSERT INTO customer (login_id, password, driver_license, customer_name, address, phone, email, previous_date, previous_car) VALUES ('user11', 'user11', '34-14-123456-78', '신하람', '경상남도 창원시 성산구 상남로 12길 20', '010-2345-6781', 'haram.shin@naver.com', '2024-02-06', '제주12파3456')",
                 "INSERT INTO customer (login_id, password, driver_license, customer_name, address, phone, email, previous_date, previous_car) VALUES ('user12', 'user12', '14-13-234567-89', '류서아', '제주특별자치도 제주시 애월로 15길 9', '010-3456-7891', 'seoa.ryu@daum.net', '2024-02-22', '광주44마7890')"
         };
-
 
         String[] employee = {
                 "INSERT INTO employee (employee_name, phone, address, salary, num_dependents, department, employee_role) VALUES ('김태현', '010-2000-0001', '서울특별시 성동구 왕십리로 10길 5', 3000000, 2, '정비부', '정비')",
@@ -248,7 +258,6 @@ public class DBInitializer {
                 "INSERT INTO parts (part_name, price, quantity, arrival_date, supplier) VALUES ('와이퍼', 12000, 60, '2025-03-01', '와이퍼샵')"
         };
 
-        // 자체 정비 3~4월만 존재
         String[] selfMaintenance = {
                 "INSERT INTO self_maintenance (date, duration, campingcar_id, part_id, employee_id) VALUES ('2024-03-01', 2, 1, 1, 1)",
                 "INSERT INTO self_maintenance (date, duration, campingcar_id, part_id, employee_id) VALUES ('2024-03-03', 1, 1, 2, 2)",
@@ -264,7 +273,6 @@ public class DBInitializer {
                 "INSERT INTO self_maintenance (date, duration, campingcar_id, part_id, employee_id) VALUES ('2024-04-23', 1, 1, 12, 12)"
         };
 
-        // 대여 기록은 1~2월만 존재
         String[] rental = {
                 "INSERT INTO rental (rental_start, rental_period, fee, deadline, additional_detail, additional_fee, campingcar_id, company_id, driver_license) VALUES ('2024-01-01', 3, 360000, '2024-02-01', '없음', 0, 1, 1, '11-24-123456-78')",
                 "INSERT INTO rental (rental_start, rental_period, fee, deadline, additional_detail, additional_fee, campingcar_id, company_id, driver_license) VALUES ('2024-01-03', 2, 280000, '2024-02-03', '와이파이 포함', 10000, 3, 3, '26-23-234567-89')",
@@ -295,7 +303,6 @@ public class DBInitializer {
                 "INSERT INTO external_maintenance_shop (shop_name, address, phone, manager_name, manager_email) VALUES ('제주정비마스터', '제주특별자치도 제주시 연북로 305', '010-3000-0012', '류지안', 'jian.ryu@jejumaster.com')"
         };
 
-        // 외부 정비 5~6월만 존재
         String[] externalRequest = {
                 "INSERT INTO external_maintenance_request (maintenance_detail, maintenance_date, fee, deadline, additional_detail, campingcar_id, shop_id, company_id, driver_license) VALUES ('엔진오일 교체', '2024-05-25', 85000, '2024-06-25', '합성유 사용', 1, 1, 1, '11-24-123456-78')",
                 "INSERT INTO external_maintenance_request (maintenance_detail, maintenance_date, fee, deadline, additional_detail, campingcar_id, shop_id, company_id, driver_license) VALUES ('타이어 교체', '2024-05-20', 90000, '2024-06-20', NULL, 3, 3, 3, '26-23-234567-89')",
@@ -318,29 +325,42 @@ public class DBInitializer {
             for (String query : rentCompany) {
                 stmt.executeUpdate(query);
             }
-            for (String query : campingCar) {
-                stmt.executeUpdate(query);
+
+            String campingCarSql = "INSERT INTO camping_car (car_name, car_number, capacity, image, car_detail, rental_fee, registration_date, company_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement pstmt = conn.prepareStatement(campingCarSql);
+            for (Object[] data : campingcar) {
+                pstmt.setString(1, (String) data[0]);
+                pstmt.setString(2, (String) data[1]);
+                pstmt.setInt(3, (Integer) data[2]);
+
+                File imageFile = new File((String) data[3]);
+                FileInputStream fin = null;
+                if (imageFile.exists()) {
+                    try {
+                        fin = new FileInputStream(imageFile);
+                        pstmt.setBinaryStream(4, fin);
+                    } catch (IOException ex) {
+                        System.out.println("이미지 파일 읽기 오류: " + imageFile.getAbsolutePath());
+                        ex.printStackTrace();
+                        pstmt.setNull(4, BLOB);
+                    }
+                } else {
+                    pstmt.setNull(4, BLOB);
+                    System.out.println("이미지 파일 없음: " + data[3]);
+                }
+                pstmt.setString(5, (String) data[4]);
+                pstmt.setInt(6, (Integer) data[5]);
+                pstmt.setString(7, (String) data[6]);
+                pstmt.setInt(8, (Integer) data[7]);
+                pstmt.executeUpdate();
             }
-            for (String query : customer) {
-                stmt.executeUpdate(query);
-            }
-            for (String query : employee) {
-                stmt.executeUpdate(query);
-            }
-            for (String query : parts) {
-                stmt.executeUpdate(query);
-            }
-            for (String query : selfMaintenance) {
-                stmt.executeUpdate(query);
-            }
-            for (String query : rental) {
-                stmt.executeUpdate(query);
-            }
-            for (String query : externalShop) {
-                stmt.executeUpdate(query);
-            }
-            for (String query : externalRequest) {
-                stmt.executeUpdate(query);
+            pstmt.close();
+
+            String[][] otherQueries = {customer, employee, parts, selfMaintenance, rental, externalShop, externalRequest};
+            for (String[] queries : otherQueries) {
+                for (String query : queries) {
+                    stmt.executeUpdate(query);
+                }
             }
 
             System.out.println("각 테이블 초기 데이터 삽입 완료");

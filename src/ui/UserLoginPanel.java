@@ -37,7 +37,6 @@ public class UserLoginPanel extends JPanel {
             }
 
             try{
-                Statement stmt = conn.createStatement();
                 String query = "SELECT * FROM  customer WHERE login_id = ? AND password = ?";
                 PreparedStatement pstmt = conn.prepareStatement(query);
                 pstmt.setString(1, id);
@@ -47,9 +46,17 @@ public class UserLoginPanel extends JPanel {
                 ResultSet rs = pstmt.executeQuery();
                 if (rs.next()) {
                     // 나중에 대여 등록할 때 쓰려고 session 에 저장해놓기
-                    Session.currentCustomerId = rs.getInt("customer_id");
+                    Session.currentCustomerDriverLicense = rs.getString("driver_license");
+                    System.out.println("사용자의 운전면허번호를 세션에 저장 운전면허번호: " + Session.currentCustomerDriverLicense);
                     JOptionPane.showMessageDialog(this, "환영합니다.");
-                    frame.switchToPanel(new UserPanel(frame, conn));
+                    // 세션에 저장해놓고 root conn 반납 후에 user conn 다시 얻어서 전달하기
+                    conn.close();
+                    Connection userConn = DriverManager.getConnection("jdbc:mysql://localhost:3306", "user1", "user1");
+                    if (frame.databaseExists(userConn)) {
+                        Statement stmt = userConn.createStatement();
+                        stmt.execute("USE camping");
+                    }
+                    frame.switchToPanel(new UserPanel(frame, userConn));
                 } else{
                     JOptionPane.showMessageDialog(this, "아이디 또는 비밀번호가 일치하지 않습니다.");
                 }
