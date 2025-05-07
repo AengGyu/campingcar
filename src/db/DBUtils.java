@@ -6,10 +6,12 @@ public class DBUtils {
     public static final Map<String, List<String>> TABLE_COLUMNS; // 각 테이블의 속성을 저장한 map
     public static final Map<String, String> PRIMARY_KEYS; // 각 테이블의 PK 속성 이름 저장한 map
     public static final Set<String> NUMERIC_COLUMNS; // 도메인이 int형인 애들을 모아놓은 set
+    public static final Map<String, Integer> MAINTENANCE_FEES; // 외부 정비소에 맡길 수 있는 정비 목록과 요금
 
     static {
         Map<String, List<String>> fieldMap = new HashMap<>();
         Map<String, String> pkMap = new HashMap<>();
+        Map<String, Integer> maintenanceMap = new HashMap<>();
 
         fieldMap.put("RENT_COMPANY", Arrays.asList("company_name", "address", "phone", "manager_name", "manager_email"));
         pkMap.put("RENT_COMPANY", "company_id");
@@ -56,6 +58,21 @@ public class DBUtils {
                 "shop_id",
                 "part_id"
         );
+
+        maintenanceMap.put("엔진오일 교체", 85000);
+        maintenanceMap.put("타이어 교체", 90000);
+        maintenanceMap.put("브레이크 패드 점검", 70000);
+        maintenanceMap.put("실내 세차", 30000);
+        maintenanceMap.put("에어컨 필터 교체", 60000);
+        maintenanceMap.put("타이밍벨트 교체", 120000);
+        maintenanceMap.put("외부 흠집 복원", 95000);
+        maintenanceMap.put("냉각수 보충", 40000);
+        maintenanceMap.put("전조등 교체", 55000);
+        maintenanceMap.put("배터리 점검", 60000);
+        maintenanceMap.put("오일 누유 점검", 75000);
+        maintenanceMap.put("샤워실 수압 문제", 65000);
+
+        MAINTENANCE_FEES = Collections.unmodifiableMap(maintenanceMap);
     }
 }
 

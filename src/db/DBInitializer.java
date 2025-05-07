@@ -156,6 +156,7 @@ public class DBInitializer {
             stmt.execute("GRANT SELECT, INSERT, UPDATE ON camping.camping_car TO 'user1'@'localhost'");
             stmt.execute("GRANT SELECT, INSERT, UPDATE, DELETE ON camping.rental TO 'user1'@'localhost'");
             stmt.execute("GRANT SELECT, INSERT, UPDATE ON camping.external_maintenance_request TO 'user1'@'localhost'");
+            stmt.execute("GRANT SELECT ON camping.external_maintenance_shop TO 'user1'@'localhost'");
             System.out.println("MYSQL 계정 생성: ID: user1, PASSWORD: user1");
 
         } catch (ClassNotFoundException e) {

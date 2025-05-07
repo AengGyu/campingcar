@@ -1,6 +1,7 @@
 package ui;
 
 import ui.usermenu.CheckRentalPanel;
+import ui.usermenu.ExternalMaintenanceRequestPanel;
 import ui.usermenu.ShowCampingcarPanel;
 
 import javax.swing.*;
@@ -57,7 +58,7 @@ public class UserPanel extends JPanel {
 //        deleteRentInfo.addActionListener(e-> setContent(null));
 //        updateRentInfo.addActionListener(e-> setContent(null));
 //        changeCampingcar.addActionListener(e -> setContent(null));
-        requestMaintenance.addActionListener(e-> setContent(null));
+        requestMaintenance.addActionListener(e -> setContent(new ExternalMaintenanceRequestPanel(conn)));
         logout.addActionListener(e->{
             try{
                 conn.close();
