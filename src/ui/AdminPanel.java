@@ -7,12 +7,14 @@ import java.awt.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+// 관리자 패널
 public class AdminPanel extends JPanel {
     private JPanel contentPanel;
 
     public AdminPanel(MainFrame frame, Connection conn) {
         setLayout(new BorderLayout());
 
+        // 메뉴 패널 생성
         JPanel menuPanel = new JPanel(new GridLayout(6, 1, 10, 10));
         JButton initBtn = new JButton("DB 초기화");
         JButton crudBtn = new JButton("입력 / 삭제 / 변경");
@@ -29,6 +31,7 @@ public class AdminPanel extends JPanel {
         queryBtn.setPreferredSize(btnSize);
         logoutBtn.setPreferredSize(btnSize);
 
+        // 메뉴 버튼 클릭 시 패널 전환
         contentPanel = new JPanel();
         contentPanel.add(new JLabel("왼쪽 메뉴를 선택하세요."));
 
@@ -38,8 +41,11 @@ public class AdminPanel extends JPanel {
         maintenanceBtn.addActionListener(e -> setContent(new ShowMaintenancePanel(conn)));
         queryBtn.addActionListener(e -> setContent(new CustomQueryPanel(conn)));
         logoutBtn.addActionListener(e -> {
+            // 로그아웃 처리
             try {
-                conn.close(); // conn 반납
+                // DB 연결 종료
+                conn.close();
+                // 메인 패널로 전환
                 frame.switchToPanel(frame.getMainPanel());
             } catch (SQLException ex) {
                 ex.printStackTrace();
@@ -59,6 +65,7 @@ public class AdminPanel extends JPanel {
     }
 
     private void setContent(JPanel panel) {
+        // 기존 패널을 제거하고 새로운 패널을 추가
         contentPanel.removeAll();
         contentPanel.add(panel);
         contentPanel.revalidate();

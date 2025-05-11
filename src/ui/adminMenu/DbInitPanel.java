@@ -5,9 +5,10 @@ import db.DBInitializer;
 import javax.swing.*;
 import java.awt.*;
 import java.sql.Connection;
-import java.sql.Statement;
 
+// 데이터베이스 초기화 패널
 public class DbInitPanel extends JPanel {
+
     public DbInitPanel(Connection conn) {
         setLayout(new FlowLayout(FlowLayout.CENTER, 0, 200));
 
@@ -18,10 +19,9 @@ public class DbInitPanel extends JPanel {
             int choice = JOptionPane.showConfirmDialog(this, "DB를 초기화 하시겠습니까?", "확인", JOptionPane.YES_NO_OPTION);
             if (choice == JOptionPane.YES_OPTION) {
                 try {
-//                    Statement stmt = conn.createStatement();
+                    // DB 초기화 및 데이터 삽입
                     DBInitializer.initialize(conn);
                     DBInitializer.dataInsert(conn);
-//                    stmt.execute("USE camping");
 
                     JOptionPane.showMessageDialog(this, "초기화 완료");
                 } catch (Exception ex) {

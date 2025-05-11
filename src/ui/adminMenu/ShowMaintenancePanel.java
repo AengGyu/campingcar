@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+// 캠핑카 정비 내역 조회 패널
 public class ShowMaintenancePanel extends JPanel {
 
     private final Connection conn;
@@ -18,33 +19,39 @@ public class ShowMaintenancePanel extends JPanel {
         JLabel title = new JLabel("캠핑카 목록", SwingConstants.CENTER);
         add(title, BorderLayout.NORTH);
 
+        // 캠핑카 목록을 보여줄 패널
         JPanel carListPanel = new JPanel();
         carListPanel.setLayout(new BoxLayout(carListPanel, BoxLayout.Y_AXIS));
 
+        // 스크롤 패널로 감싸기
         JScrollPane scrollPane = new JScrollPane(carListPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setPreferredSize(new Dimension(600, 700));
         add(scrollPane, BorderLayout.CENTER);
 
         try {
+            // 캠핑카 목록 가져오기
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT campingcar_id, car_name from camping_car");
             System.out.println("SELECT campingcar_id, car_name from camping_car 실행");
 
             while (rs.next()) {
+                // 캠핑카 ID와 이름 가져오기
                 int campingcar_id = rs.getInt("campingcar_id");
                 String carName = rs.getString("car_name");
 
                 JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
                 rowPanel.setPreferredSize(new Dimension(600, 40));
+                // 캠핑카 ID와 이름을 JLabel로 표시
                 rowPanel.add(new JLabel("[" + campingcar_id + "] " + carName));
 
+                // 자체 정비 내역 보기 버튼과 외부 정비 내역 보기 버튼 생성
                 JButton selfBtn = new JButton("자체 정비 내역 보기");
                 selfBtn.setPreferredSize(new Dimension(180, 40));
                 JButton externalBtn = new JButton("외부 정비 내역 보기");
                 externalBtn.setPreferredSize(new Dimension(180, 40));
 
-                // 버튼 누르면 다이얼로그로 볼 수 있게
+                // 버튼 클릭 시 각각의 정비 내역을 보여주는 메소드 호출
                 selfBtn.addActionListener(e -> showSelfMaintenance(campingcar_id));
                 externalBtn.addActionListener(e -> showExternalMaintenance(campingcar_id));
 
@@ -60,6 +67,7 @@ public class ShowMaintenancePanel extends JPanel {
     }
 
     private void showSelfMaintenance(int campingcarId) {
+        // 자체 정비 내역을 보여주는 다이얼로그 생성
         JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "자체 정비 내역", true);
         dialog.setSize(800, 600);
         dialog.setLayout(new BorderLayout());
@@ -70,13 +78,17 @@ public class ShowMaintenancePanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(contentPanel);
         dialog.add(scrollPane, BorderLayout.CENTER);
 
+
         try {
+            // 캠핑카 ID에 해당하는 자체 정비 내역 조회
             Statement stmt = conn.createStatement();
             String query = "SELECT * FROM self_maintenance WHERE campingcar_id = " + campingcarId;
             System.out.println(query + " 실행");
             ResultSet rs = stmt.executeQuery(query);
+            // 정비 내역이 있는지 확인하는 flag 변수 hasData
             boolean hasData = false;
 
+            // 정비 내역을 하나씩 가져와서 패널에 추가
             while (rs.next()) {
                 hasData = true;
                 int maintenanceId = rs.getInt("maintenance_id");
@@ -88,13 +100,16 @@ public class ShowMaintenancePanel extends JPanel {
                 JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
                 JLabel label = new JLabel(String.format("[%d] 날짜: %s, 소요시간: %d일, 직원ID: %d",
                         maintenanceId, date, duration, employeeId));
+                // 부품 ID 버튼 생성
                 JButton partButton = new JButton("부품 ID: " + partId);
+                // 부품 ID 버튼 클릭 시 부품 정보 다이얼로그 띄우기
                 partButton.addActionListener(e -> showPartDetail(partId));
 
                 row.add(label);
                 row.add(partButton);
                 contentPanel.add(row);
             }
+            // 정비 내역이 없을 경우 "정비 내역 없음" 메시지 표시
             if (!hasData) {
                 JLabel noDataLabel = new JLabel("정비 내역 없음");
                 noDataLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -106,8 +121,10 @@ public class ShowMaintenancePanel extends JPanel {
             e.printStackTrace();
         }
 
+        // 닫기 버튼 생성
         JButton closeBtn = new JButton("닫기");
         closeBtn.addActionListener(e -> dialog.dispose());
+
         JPanel btnPanel = new JPanel();
         btnPanel.add(closeBtn);
         dialog.add(btnPanel, BorderLayout.SOUTH);
@@ -117,6 +134,7 @@ public class ShowMaintenancePanel extends JPanel {
     }
 
     private void showExternalMaintenance(int campingcarId) {
+        // 외부 정비 내역을 보여주는 다이얼로그 생성
         JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "외부 정비 내역", true);
         dialog.setSize(800, 600);
         dialog.setLayout(new BorderLayout());
@@ -128,12 +146,15 @@ public class ShowMaintenancePanel extends JPanel {
         dialog.add(scrollPane, BorderLayout.CENTER);
 
         try {
+            // 캠핑카 ID에 해당하는 외부 정비 내역 조회
             Statement stmt = conn.createStatement();
             String query = "SELECT * FROM external_maintenance_request WHERE campingcar_id = " + campingcarId;
             System.out.println(query + " 실행");
             ResultSet rs = stmt.executeQuery(query);
+            // 정비 내역이 있는지 확인하는 flag 변수 hasData
             boolean hasData = false;
 
+            // 정비 내역을 하나씩 가져와서 패널에 추가
             while (rs.next()) {
                 hasData = true;
                 int maintenanceId = rs.getInt("maintenance_id");
@@ -147,12 +168,14 @@ public class ShowMaintenancePanel extends JPanel {
                 JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
                 JLabel label = new JLabel(String.format("[%d] 날짜: %s, 비용: %,d원, 마감일: %s, 내용: %s",
                         maintenanceId, date, fee, deadline, detail));
-
+                // 추가 사항이 있을 경우 레이블에 추가
                 if (additional != null && !additional.isEmpty()) {
                     label.setText(label.getText() + " (추가: " + additional + ")");
                 }
 
+                // 정비소 ID 버튼 생성
                 JButton shopButton = new JButton("정비소 ID: " + shopId);
+                // 정비소 ID 버튼 클릭 시 정비소 정보 다이얼로그 띄우기
                 shopButton.addActionListener(e -> showShopDetail(shopId));
 
                 row.add(label);
@@ -160,6 +183,7 @@ public class ShowMaintenancePanel extends JPanel {
                 contentPanel.add(row);
             }
 
+            // 정비 내역이 없을 경우 "정비 내역 없음" 메시지 표시
             if (!hasData) {
                 JLabel noDataLabel = new JLabel("정비 내역 없음");
                 noDataLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -183,6 +207,7 @@ public class ShowMaintenancePanel extends JPanel {
     }
 
     private void showPartDetail(int partId) {
+        // 부품 정보를 보여주는 다이얼로그 생성
         JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "부품 정보", true);
         dialog.setLayout(new BorderLayout());
 
@@ -190,11 +215,13 @@ public class ShowMaintenancePanel extends JPanel {
         partInfo.setEditable(false);
 
         try {
+            // 부품 ID에 해당하는 부품 정보 조회
             Statement stmt = conn.createStatement();
             String query = "SELECT * FROM parts WHERE part_id = " + partId;
             System.out.println(query + " 실행");
             ResultSet rs = stmt.executeQuery(query);
 
+            // 부품 정보를 가져와서 텍스트 영역에 표시
             if (rs.next()) {
                 StringBuilder sb = new StringBuilder();
                 sb.append("부품 ID: ").append(rs.getInt("part_id")).append("\n");
@@ -223,6 +250,7 @@ public class ShowMaintenancePanel extends JPanel {
     }
 
     private void showShopDetail(int shopId) {
+        // 정비소 정보를 보여주는 다이얼로그 생성
         JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "정비소 정보", true);
         dialog.setLayout(new BorderLayout());
 
@@ -230,11 +258,13 @@ public class ShowMaintenancePanel extends JPanel {
         shopInfo.setEditable(false);
 
         try {
+            // 정비소 ID에 해당하는 정비소 정보 조회
             Statement stmt = conn.createStatement();
             String query = "SELECT * FROM external_maintenance_shop WHERE shop_id = " + shopId;
             System.out.println(query + "실행");
             ResultSet rs = stmt.executeQuery(query);
 
+            // 정비소 정보를 가져와서 텍스트 영역에 표시
             if (rs.next()) {
                 StringBuilder sb = new StringBuilder();
                 sb.append("정비소 ID: ").append(rs.getInt("shop_id")).append("\n");

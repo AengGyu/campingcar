@@ -4,7 +4,6 @@ import db.DBUtils;
 import db.Session;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -15,6 +14,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+// 대여 정보 조회 패널
 public class CheckRentalPanel extends JPanel {
 
     public CheckRentalPanel(Connection conn) {
@@ -24,18 +24,21 @@ public class CheckRentalPanel extends JPanel {
         label.setHorizontalAlignment(SwingConstants.CENTER);
         add(label, BorderLayout.NORTH);
 
+        // RENTAL 테이블 PK 가져오기
         String tableName = "RENTAL";
         String pk = DBUtils.PRIMARY_KEYS.get(tableName);
 
+        // RENTAL 테이블의 속성 이름 가져오기
         List<String> columns = new ArrayList<>();
         columns.add(pk);
         columns.addAll(DBUtils.TABLE_COLUMNS.get(tableName));
         String[] columnNames = columns.toArray(String[]::new);
 
-        String query = "SELECT * FROM rental WHERE driver_license = ?";
-        System.out.println(query +" 실행");
 
         try{
+            // SELECT 쿼리 실행
+            String query = "SELECT * FROM rental WHERE driver_license = ?";
+            System.out.println(query +" 실행");
             PreparedStatement pstmt = conn.prepareStatement(query);
             pstmt.setString(1, Session.currentCustomerDriverLicense);
             ResultSet rs = pstmt.executeQuery();
@@ -53,15 +56,15 @@ public class CheckRentalPanel extends JPanel {
 
             Object[][] data = rows.toArray(Object[][]::new);
 
-            DefaultTableModel model = new DefaultTableModel(data, columnNames) {
+            // 수정 불가능한 JTable 생성
+            JTable table = new JTable(data, columnNames) {
                 @Override
                 public boolean isCellEditable(int row, int column) {
                     return false;
                 }
             };
-
-            JTable table = new JTable(model);
             table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
             for (int i = 0; i < table.getColumnCount(); i++) {
                 table.getColumnModel().getColumn(i).setPreferredWidth(150);
             }
@@ -71,12 +74,15 @@ public class CheckRentalPanel extends JPanel {
 
             add(scrollPane, BorderLayout.CENTER);
 
+            // 테이블 클릭 시
             table.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     int row = table.getSelectedRow();
                     if (row != -1) {
+                        // 대여 ID 가져오기
                         int rentalId = Integer.parseInt(table.getValueAt(row, 0).toString());
+                        // 대여 정보 수정 또는 삭제 다이얼로그 열기
                         new UpdateOrDeleteDialog((Frame) SwingUtilities.getWindowAncestor(CheckRentalPanel.this), conn, rentalId);
                     }
                 }

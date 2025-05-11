@@ -130,7 +130,6 @@ public class DBInitializer {
         };  // 렌트카 사진 NOT NULL 결정해야됨, 테스트할 땐 일단 null 허용해놓고
 
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
             Statement stmt = conn.createStatement();
 
             stmt.execute("CREATE SCHEMA IF NOT EXISTS camping DEFAULT CHARACTER SET utf8;");
@@ -157,18 +156,13 @@ public class DBInitializer {
             stmt.execute("GRANT SELECT, INSERT, UPDATE, DELETE ON camping.rental TO 'user1'@'localhost'");
             stmt.execute("GRANT SELECT, INSERT, UPDATE ON camping.external_maintenance_request TO 'user1'@'localhost'");
             stmt.execute("GRANT SELECT ON camping.external_maintenance_shop TO 'user1'@'localhost'");
+
             System.out.println("MYSQL 계정 생성: ID: user1, PASSWORD: user1");
 
-        } catch (ClassNotFoundException e) {
-            System.out.println("JDBC 드라이버 로드 오류");
-            e.printStackTrace();
         } catch (SQLException e) {
             System.out.println("SQL 실행오류");
             e.printStackTrace();
         }
-    }
-
-    public DBInitializer() {
     }
 
     public static void dataInsert(Connection conn) {
@@ -320,7 +314,6 @@ public class DBInitializer {
         };
 
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
             Statement stmt = conn.createStatement();
 
             for (String query : rentCompany) {
@@ -366,9 +359,6 @@ public class DBInitializer {
 
             System.out.println("각 테이블 초기 데이터 삽입 완료");
 
-        } catch (ClassNotFoundException e) {
-            System.out.println("JDBC 드라이버 로드 오류");
-            e.printStackTrace();
         } catch (SQLException e) {
             System.out.println("SQL 실행오류");
             e.printStackTrace();

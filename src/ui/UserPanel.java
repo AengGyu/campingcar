@@ -9,6 +9,7 @@ import java.awt.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+// 사용자 패널
 public class UserPanel extends JPanel {
 
     private JPanel contentPanel;
@@ -16,35 +17,21 @@ public class UserPanel extends JPanel {
     public UserPanel(MainFrame frame, Connection conn) {
         setLayout(new BorderLayout());
 
+        // 메뉴 패널 생성
         JPanel menuPanel = new JPanel(new GridLayout(4, 1, 10, 10));
         JButton showCampingcarBtn = new JButton("캠핑카 조회");
-//        JButton availableDateBtn = new JButton("대여 가능 일자 조회"); // 조회에서 한 번에 해결하는 걸로 수정함
-//        JButton rentBtn = new JButton("대여 등록");
         JButton rentInfo = new JButton("대여 정보 확인");
-//        JButton deleteRentInfo = new JButton("대여 정보 삭제"); // 대여 정보 확인에서 삭제, 수정 가능하게 수정
-//        JButton updateRentInfo = new JButton("대여 일정 수정");
-//        JButton changeCampingcar = new JButton("캠핑카 변경");
         JButton requestMaintenance = new JButton("정비 의뢰");
         JButton logout = new JButton("로그아웃");
 
         Dimension btnSize = new Dimension(220, 50);
         showCampingcarBtn.setPreferredSize(btnSize);
-//        availableDateBtn.setPreferredSize(btnSize);
-//        rentBtn.setPreferredSize(btnSize);
         rentInfo.setPreferredSize(btnSize);
-//        deleteRentInfo.setPreferredSize(btnSize);
-//        updateRentInfo.setPreferredSize(btnSize);
-//        changeCampingcar.setPreferredSize(btnSize);
         requestMaintenance.setPreferredSize(btnSize);
         logout.setPreferredSize(btnSize);
 
         menuPanel.add(showCampingcarBtn);
-//        menuPanel.add(availableDateBtn);
-//        menuPanel.add(rentBtn);
         menuPanel.add(rentInfo);
-//        menuPanel.add(deleteRentInfo);
-//        menuPanel.add(updateRentInfo);
-//        menuPanel.add(changeCampingcar);
         menuPanel.add(requestMaintenance);
         menuPanel.add(logout);
 
@@ -52,16 +39,14 @@ public class UserPanel extends JPanel {
         contentPanel.add(new JLabel("왼쪽 메뉴를 선택하세요"));
 
         showCampingcarBtn.addActionListener(e-> setContent(new ShowCampingcarPanel(conn)));
-//        availableDateBtn.addActionListener(e-> setContent(null));
-//        rentBtn.addActionListener(e-> setContent(null));
         rentInfo.addActionListener(e-> setContent(new CheckRentalPanel(conn)));
-//        deleteRentInfo.addActionListener(e-> setContent(null));
-//        updateRentInfo.addActionListener(e-> setContent(null));
-//        changeCampingcar.addActionListener(e -> setContent(null));
         requestMaintenance.addActionListener(e -> setContent(new ExternalMaintenanceRequestPanel(conn)));
         logout.addActionListener(e->{
+            // 로그아웃 처리
             try{
+                // DB 연결 종료
                 conn.close();
+                // 메인 패널로 전환
                 frame.switchToPanel(frame.getMainPanel());
             } catch (SQLException ex) {
                 ex.printStackTrace();
@@ -74,6 +59,7 @@ public class UserPanel extends JPanel {
     }
 
     private void setContent(JPanel panel) {
+        // 기존 패널을 제거하고 새로운 패널을 추가
         contentPanel.removeAll();
         contentPanel.add(panel);
         contentPanel.revalidate();

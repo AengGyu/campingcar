@@ -7,6 +7,7 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
 
+// 대여 정보 수정 다이얼로그
 public class UpdateRentalDialog extends JDialog {
 
     public UpdateRentalDialog(Frame owner, Connection conn, int rentalId) {
@@ -22,11 +23,13 @@ public class UpdateRentalDialog extends JDialog {
         Map<Integer, Integer> rentalFeeMap = new HashMap<>();
 
         try {
-            // 캠핑카 목록을 콤보에 저장하고, 맵에 해당 캠핑카 요금 정보 저장하기
+            // 캠핑카 목록, 요금 정보 조회 쿼리
             String carQuery = "SELECT campingcar_id, rental_fee FROM camping_car";
+            System.out.println(carQuery + " 실행");
             PreparedStatement carStmt = conn.prepareStatement(carQuery);
             ResultSet carRs = carStmt.executeQuery();
             while (carRs.next()) {
+                // 캠핑카 ID와 요금을 가져와서 콤보박스와 맵에 추가
                 int carId = carRs.getInt("campingcar_id");
                 int fee = carRs.getInt("rental_fee");
                 campingcarCombo.addItem(carId);
@@ -49,14 +52,17 @@ public class UpdateRentalDialog extends JDialog {
         add(formPanel, BorderLayout.CENTER);
 
         int currentCampingcarId = 0;
+
         try {
-            // 수정 전 기존값들로 입력 필드 채워놓기
+            // 기존 대여 정보 조회 쿼리
             String query = "SELECT rental_start, rental_period, campingcar_id FROM rental WHERE rental_id = ?";
+            System.out.println(query + " 실행");
             PreparedStatement pstmt = conn.prepareStatement(query);
             pstmt.setInt(1, rentalId);
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
+                // 기존 정보에서 대여 시작일, 대여 기간, 캠핑카 ID를 가져와서 필드에 설정
                 startDateField.setText(rs.getDate("rental_start").toLocalDate().toString());
                 periodField.setText(String.valueOf(rs.getInt("rental_period")));
                 currentCampingcarId = rs.getInt("campingcar_id");
@@ -70,20 +76,34 @@ public class UpdateRentalDialog extends JDialog {
         }
 
         JButton updateBtn = new JButton("수정");
+        JButton cancelBtn = new JButton("취소");
+
         updateBtn.addActionListener(e -> {
             try {
-                int confirm = JOptionPane.showConfirmDialog(
-                        this,
-                        "입력한 정보로 대여 내용을 수정하시겠습니까?",
-                        "수정 확인",
-                        JOptionPane.YES_NO_OPTION
-                );
+                int confirm = JOptionPane.showConfirmDialog(this, "입력한 정보로 대여 내용을 수정하시겠습니까?", "수정 확인", JOptionPane.YES_NO_OPTION);
+                // YES_OPTION 이 아닐 경우 다이얼로그 닫기
                 if (confirm != JOptionPane.YES_OPTION) return;
 
+                // 수정하려는 대여 시작일과 대여 기간 입력값 가져오기
                 LocalDate newStart = LocalDate.parse(startDateField.getText().trim());
                 int newPeriod = Integer.parseInt(periodField.getText().trim());
+                // 대여 종료일 계산
                 LocalDate newEnd = newStart.plusDays(newPeriod);
+                // 선택한 캠핑카 ID 가져오기
                 int newCampingcarId = (int) campingcarCombo.getSelectedItem();
+
+
+                // 대여 시작일이 오늘 이후여야 함
+                if (newStart.isBefore(LocalDate.now())) {
+                    JOptionPane.showMessageDialog(this, "오늘 이후의 날짜로만 수정할 수 있습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // 대여 기간이 1일 이상이어야 함
+                if (newPeriod <= 0) {
+                    JOptionPane.showMessageDialog(this, "대여 기간은 1일 이상이어야 합니다.", "오류", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
 
                 // 원하는 대여 기간에 중복되는 대여 기록이 있는지 확인
                 String checkQuery = "SELECT 1 FROM rental WHERE campingcar_id = ? AND rental_id != ? AND rental_start < ? AND DATE_ADD(rental_start, INTERVAL rental_period DAY) > ?";
@@ -99,10 +119,13 @@ public class UpdateRentalDialog extends JDialog {
                     return;
                 }
 
+                // 대여 요금 계산
                 int fee = rentalFeeMap.getOrDefault(newCampingcarId, 0);
                 int newTotalFee = fee * newPeriod;
+                // 마감일 갱신
                 LocalDate newDeadline = newStart.plusDays(7);
 
+                // 대여 정보 수정 쿼리
                 String updateQuery = "UPDATE rental SET rental_start = ?, rental_period = ?, fee = ?, deadline = ?, campingcar_id = ? WHERE rental_id = ?";
                 PreparedStatement updateStmt = conn.prepareStatement(updateQuery);
                 updateStmt.setDate(1, Date.valueOf(newStart));
@@ -126,8 +149,12 @@ public class UpdateRentalDialog extends JDialog {
             }
         });
 
+        // 취소 버튼 클릭 시 다이얼로그 닫기
+        cancelBtn.addActionListener(e -> dispose());
+
         JPanel btnPanel = new JPanel();
         btnPanel.add(updateBtn);
+        btnPanel.add(cancelBtn);
         add(btnPanel, BorderLayout.SOUTH);
 
         setSize(450, 250);
