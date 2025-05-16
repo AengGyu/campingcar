@@ -52,6 +52,7 @@ public class UpdateRentalDialog extends JDialog {
         add(formPanel, BorderLayout.CENTER);
 
         int currentCampingcarId = 0;
+        LocalDate originalStartDate = null;
 
         try {
             // 기존 대여 정보 조회 쿼리
@@ -63,7 +64,8 @@ public class UpdateRentalDialog extends JDialog {
 
             if (rs.next()) {
                 // 기존 정보에서 대여 시작일, 대여 기간, 캠핑카 ID를 가져와서 필드에 설정
-                startDateField.setText(rs.getDate("rental_start").toLocalDate().toString());
+                originalStartDate = rs.getDate("rental_start").toLocalDate();
+                startDateField.setText(originalStartDate.toString());
                 periodField.setText(String.valueOf(rs.getInt("rental_period")));
                 currentCampingcarId = rs.getInt("campingcar_id");
                 campingcarCombo.setSelectedItem(currentCampingcarId);
@@ -78,6 +80,7 @@ public class UpdateRentalDialog extends JDialog {
         JButton updateBtn = new JButton("수정");
         JButton cancelBtn = new JButton("취소");
 
+        LocalDate finalOriginalStartDate = originalStartDate;
         updateBtn.addActionListener(e -> {
             try {
                 int confirm = JOptionPane.showConfirmDialog(this, "입력한 정보로 대여 내용을 수정하시겠습니까?", "수정 확인", JOptionPane.YES_NO_OPTION);
@@ -94,7 +97,7 @@ public class UpdateRentalDialog extends JDialog {
 
 
                 // 대여 시작일이 오늘 이후여야 함
-                if (newStart.isBefore(LocalDate.now())) {
+                if (newStart.isBefore(LocalDate.now()) && !newStart.equals(finalOriginalStartDate)) {
                     JOptionPane.showMessageDialog(this, "오늘 이후의 날짜로만 수정할 수 있습니다.", "오류", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
@@ -107,6 +110,7 @@ public class UpdateRentalDialog extends JDialog {
 
                 // 원하는 대여 기간에 중복되는 대여 기록이 있는지 확인
                 String checkQuery = "SELECT 1 FROM rental WHERE campingcar_id = ? AND rental_id != ? AND rental_start < ? AND DATE_ADD(rental_start, INTERVAL rental_period DAY) > ?";
+                System.out.println(checkQuery + " 실행");
                 PreparedStatement checkStmt = conn.prepareStatement(checkQuery);
                 checkStmt.setInt(1, newCampingcarId);
                 checkStmt.setInt(2, rentalId);
@@ -127,6 +131,7 @@ public class UpdateRentalDialog extends JDialog {
 
                 // 대여 정보 수정 쿼리
                 String updateQuery = "UPDATE rental SET rental_start = ?, rental_period = ?, fee = ?, deadline = ?, campingcar_id = ? WHERE rental_id = ?";
+                System.out.println(updateQuery + " 실행");
                 PreparedStatement updateStmt = conn.prepareStatement(updateQuery);
                 updateStmt.setDate(1, Date.valueOf(newStart));
                 updateStmt.setInt(2, newPeriod);
