@@ -59,11 +59,14 @@ public class UserLoginPanel extends JPanel {
                     JOptionPane.showMessageDialog(this, "환영합니다.");
                     // 세션에 사용자 정보 저장 후 root 커넥션 반납하고 user 커넥션 생성
                     conn.close();
+                    System.out.println("DB 연결 종료, root 커넥션 close");
                     Connection userConn = DriverManager.getConnection("jdbc:mysql://localhost:3306", "user1", "user1");
+                    System.out.println("DB 연결 성공, user1 계정으로 로그인");
                     if (frame.databaseExists(userConn)) {
                         // user conn에 미리 use camping 선언 해놓기
                         Statement stmt = userConn.createStatement();
                         stmt.execute("USE camping");
+                        System.out.println("USE camping 실행");
                     }
                     // 사용자 메뉴 패널로 전환
                     frame.switchToPanel(new UserPanel(frame, userConn));

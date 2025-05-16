@@ -17,6 +17,7 @@ public class CrudPanel extends JPanel {
 
     private final Connection conn;
     private final JPanel contentPanel;
+    private static final List<String> IMAGE_EXTENSIONS = List.of(".jpg", ".jpeg", ".png", ".gif");
 
     public CrudPanel(Connection conn) {
         this.conn = conn;
@@ -72,7 +73,6 @@ public class CrudPanel extends JPanel {
             // 선택한 테이블의 속성 리스트 가져오기
             List<String> columns = DBUtils.TABLE_COLUMNS.get(selectedTable);
 
-
             contentPanel.removeAll();
             contentPanel.setLayout(new BorderLayout());
 
@@ -95,6 +95,9 @@ public class CrudPanel extends JPanel {
                     JPanel imagePanel = new JPanel(new BorderLayout());
                     JButton uploadBtn = new JButton("파일 선택");
                     JLabel imageLabel = new JLabel("선택된 파일 없음", SwingConstants.CENTER);
+                    JTextField imagePathField = new JTextField();
+                    imagePathField.setEditable(false);
+                    fieldInputs.add(imagePathField);
 
                     // 업로드 버튼 클릭 시
                     uploadBtn.addActionListener(e1 -> {
@@ -104,8 +107,16 @@ public class CrudPanel extends JPanel {
                         if (result == JFileChooser.APPROVE_OPTION) {
                             // 선택한 파일 경로 가져오기
                             String filePath = fileChooser.getSelectedFile().getAbsolutePath();
+
+                            // 이미지인지 확인
+                            if (!isImage(filePath)) {
+                                JOptionPane.showMessageDialog(this, "이미지 파일만 선택할 수 있습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+
                             // 레이블에 파일 경로 표시
                             imageLabel.setText(filePath);
+                            imagePathField.setText(filePath);
                         }
                     });
 
@@ -113,7 +124,6 @@ public class CrudPanel extends JPanel {
                     imagePanel.add(imageLabel, BorderLayout.CENTER);
 
                     formPanel.add(imagePanel);
-                    fieldInputs.add(new JTextField(imageLabel.getText()));
                 } else { // 나머지 속성의 경우
                     // 일반 텍스트 필드 만들기
                     JTextField field = new JTextField();
@@ -144,7 +154,7 @@ public class CrudPanel extends JPanel {
                 }
 
                 // INSERT 쿼리 만들기
-                String query = createInsertQuery(selectedTable, columns, values);
+                String query = createInsertQuery(selectedTable, columns);
 
                 try {
                     // PreparedStatement로 쿼리 실행 -> 수정하자
@@ -247,10 +257,38 @@ public class CrudPanel extends JPanel {
             // 속성 리스트에 있는 속성 이름으로 입력 필드 만들기
             for (String col : columns) {
                 formPanel.add(new JLabel(col + ":"));
-                JTextField field = new JTextField();
-                field.setPreferredSize(new Dimension(300, 35));
-                formPanel.add(field);
-                valueFields.add(field);
+
+                if (col.equalsIgnoreCase("image")) {
+                    JPanel imagePanel = new JPanel(new BorderLayout());
+                    JButton uploadBtn = new JButton("파일 선택");
+                    JLabel imageLabel = new JLabel("선택된 파일 없음", SwingConstants.CENTER);
+                    JTextField imagePathField = new JTextField();
+                    imagePathField.setEditable(false);
+                    valueFields.add(imagePathField);
+
+                    uploadBtn.addActionListener(e1 -> {
+                        JFileChooser fileChooser = new JFileChooser();
+                        int result = fileChooser.showOpenDialog(this);
+                        if (result == JFileChooser.APPROVE_OPTION) {
+                            String filePath = fileChooser.getSelectedFile().getAbsolutePath();
+                            if (!isImage(filePath)) {
+                                JOptionPane.showMessageDialog(this, "이미지 파일만 선택할 수 있습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+                            imageLabel.setText(filePath);
+                            imagePathField.setText(filePath);
+                        }
+                    });
+
+                    imagePanel.add(uploadBtn, BorderLayout.WEST);
+                    imagePanel.add(imageLabel, BorderLayout.CENTER);
+                    formPanel.add(imagePanel);
+                } else {
+                    JTextField field = new JTextField();
+                    field.setPreferredSize(new Dimension(300, 35));
+                    formPanel.add(field);
+                    valueFields.add(field);
+                }
             }
 
             JButton deleteBtn = new JButton("삭제 실행");
@@ -274,8 +312,32 @@ public class CrudPanel extends JPanel {
 
                 // DELETE 쿼리 실행
                 try {
-                    Statement stmt = conn.createStatement();
-                    int count = stmt.executeUpdate(query);
+                    PreparedStatement pstmt = conn.prepareStatement(query);
+                    int paramIdx = 1;
+
+                    for (int i = 0; i < columns.size(); i++) {
+                        String col = columns.get(i);
+                        String val = values.get(i);
+                        if (val.isEmpty()) continue;
+
+                        if (DBUtils.INT_COLUMNS.contains(col)) {
+                            pstmt.setInt(paramIdx++, Integer.parseInt(val));
+                        } else if (DBUtils.DATE_COLUMNS.contains(col)) {
+                            pstmt.setDate(paramIdx++, Date.valueOf(val));
+                        } else if (DBUtils.BLOB_COLUMNS.contains(col)) {
+                            try {
+                                FileInputStream fin = new FileInputStream(val);
+                                pstmt.setBinaryStream(paramIdx++, fin);
+                            } catch (FileNotFoundException ex) {
+                                ex.printStackTrace();
+                                pstmt.setNull(paramIdx++, Types.BLOB);
+                            }
+                        } else {
+                            pstmt.setString(paramIdx++, val);
+                        }
+                    }
+
+                    int count = pstmt.executeUpdate();
                     System.out.println(query);
                     JOptionPane.showMessageDialog(this, count + "개 행 삭제 완료");
                     showDeletePanel();
@@ -336,12 +398,44 @@ public class CrudPanel extends JPanel {
             // 속성 리스트에 있는 속성 이름으로 수정 조건 입력 필드 만들기
             for (String col : columns) {
                 conditionPanel.add(new JLabel(col + ":"));
-                JTextField field = new JTextField();
-                field.setPreferredSize(new Dimension(300, 35));
-                conditionPanel.add(field);
-                conditionFields.add(field);
-            }
 
+                if (col.equalsIgnoreCase("image")) {
+                    JPanel imagePanel = new JPanel(new BorderLayout());
+                    JButton uploadBtn = new JButton("파일 선택");
+                    JLabel imageLabel = new JLabel("선택된 파일 없음", SwingConstants.CENTER);
+                    JTextField imagePathField = new JTextField();
+                    imagePathField.setEditable(false);
+                    conditionFields.add(imagePathField);
+
+                    // 업로드 버튼 클릭 시
+                    uploadBtn.addActionListener(e1 -> {
+                        JFileChooser fileChooser = new JFileChooser();
+                        int result = fileChooser.showOpenDialog(this);
+                        if (result == JFileChooser.APPROVE_OPTION) {
+                            String filePath = fileChooser.getSelectedFile().getAbsolutePath();
+
+                            // 이미지인지 확인
+                            if (!isImage(filePath)) {
+                                JOptionPane.showMessageDialog(this, "이미지 파일만 선택할 수 있습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+
+                            // 레이블에 파일 경로 표시
+                            imageLabel.setText(filePath);
+                            imagePathField.setText(filePath);
+                        }
+                    });
+
+                    imagePanel.add(uploadBtn, BorderLayout.WEST);
+                    imagePanel.add(imageLabel, BorderLayout.CENTER);
+                    conditionPanel.add(imagePanel);
+                } else {
+                    JTextField field = new JTextField();
+                    field.setPreferredSize(new Dimension(300, 35));
+                    conditionPanel.add(field);
+                    conditionFields.add(field);
+                }
+            }
 
             JButton nextBtn = new JButton("수정값 입력하기");
             nextBtn.setPreferredSize(new Dimension(150, 35));
@@ -378,19 +472,50 @@ public class CrudPanel extends JPanel {
         List<String> editableColumns = new ArrayList<>(columns);
         editableColumns.remove(pk);
 
-
         JPanel formPanel = new JPanel(new GridLayout(editableColumns.size() + 1, 2, 10, 10));
         List<JTextField> updateFields = new ArrayList<>();
 
         // 속성 리스트에 있는 속성 이름으로 수정값 입력 필드 만들기
         for (String col : editableColumns) {
             formPanel.add(new JLabel(col + ":"));
-            JTextField field = new JTextField();
-            field.setPreferredSize(new Dimension(300, 35));
-            formPanel.add(field);
-            updateFields.add(field);
-        }
 
+            if (col.equalsIgnoreCase("image")) {
+                JPanel imagePanel = new JPanel(new BorderLayout());
+                JButton uploadBtn = new JButton("파일 선택");
+                JLabel imageLabel = new JLabel("선택된 파일 없음", SwingConstants.CENTER);
+                JTextField imagePathField = new JTextField();
+                imagePathField.setEditable(false);
+                updateFields.add(imagePathField);
+
+                // 업로드 버튼 클릭 시
+                uploadBtn.addActionListener(e -> {
+                    JFileChooser fileChooser = new JFileChooser();
+                    int result = fileChooser.showOpenDialog(this);
+                    if (result == JFileChooser.APPROVE_OPTION) {
+                        String filePath = fileChooser.getSelectedFile().getAbsolutePath();
+
+                        // 이미지인지 확인
+                        if (!isImage(filePath)) {
+                            JOptionPane.showMessageDialog(this, "이미지 파일만 선택할 수 있습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+
+                        // 레이블에 파일 경로 표시
+                        imageLabel.setText(filePath);
+                        imagePathField.setText(filePath);
+                    }
+                });
+
+                imagePanel.add(uploadBtn, BorderLayout.WEST);
+                imagePanel.add(imageLabel, BorderLayout.CENTER);
+                formPanel.add(imagePanel);
+            } else {
+                JTextField field = new JTextField();
+                field.setPreferredSize(new Dimension(300, 35));
+                formPanel.add(field);
+                updateFields.add(field);
+            }
+        }
 
         JButton updateBtn = new JButton("수정하기");
         updateBtn.setPreferredSize(new Dimension(120, 35));
@@ -427,9 +552,57 @@ public class CrudPanel extends JPanel {
 
             // UPDATE 쿼리 실행
             try {
-                Statement stmt = conn.createStatement();
-                int count = stmt.executeUpdate(query);
-                System.out.println(query);
+                PreparedStatement pstmt = conn.prepareStatement(query);
+                int paramIdx = 1;
+
+                // SET절 값 바인딩
+                for (int i = 0; i < editableColumns.size(); i++) {
+                    String col = editableColumns.get(i);
+                    String val = updateValues.get(i);
+                    if (val.isEmpty()) continue;
+
+                    if (DBUtils.INT_COLUMNS.contains(col)) {
+                        pstmt.setInt(paramIdx++, Integer.parseInt(val));
+                    } else if (DBUtils.DATE_COLUMNS.contains(col)) {
+                        pstmt.setDate(paramIdx++, Date.valueOf(val));
+                    } else if (DBUtils.BLOB_COLUMNS.contains(col)) {
+                        try {
+                            FileInputStream fin = new FileInputStream(val);
+                            pstmt.setBinaryStream(paramIdx++, fin);
+                        } catch (FileNotFoundException ex) {
+                            System.out.println("이미지 파일 읽기 오류: " + val);
+                            ex.printStackTrace();
+                            pstmt.setNull(paramIdx++, Types.BLOB);
+                        }
+                    } else {
+                        pstmt.setString(paramIdx++, val);
+                    }
+                }
+
+                // WHERE절 값 바인딩
+                for (int i = 0; i < columns.size(); i++) {
+                    String col = columns.get(i);
+                    String val = conditionValues.get(i);
+                    if (val.isEmpty()) continue;
+
+                    if (DBUtils.INT_COLUMNS.contains(col)) {
+                        pstmt.setInt(paramIdx++, Integer.parseInt(val));
+                    } else if (DBUtils.DATE_COLUMNS.contains(col)) {
+                        pstmt.setDate(paramIdx++, Date.valueOf(val));
+                    } else if (DBUtils.BLOB_COLUMNS.contains(col)) {
+                        try {
+                            FileInputStream fin = new FileInputStream(val);
+                            pstmt.setBinaryStream(paramIdx++, fin);
+                        } catch (FileNotFoundException ex) {
+                            ex.printStackTrace();
+                            pstmt.setNull(paramIdx++, Types.BLOB);
+                        }
+                    } else {
+                        pstmt.setString(paramIdx++, val);
+                    }
+                }
+
+                int count = pstmt.executeUpdate();
                 JOptionPane.showMessageDialog(this, count + "개 행 수정 완료");
                 showUpdatePanel();
             } catch (SQLException ex) {
@@ -439,9 +612,8 @@ public class CrudPanel extends JPanel {
         });
     }
 
-    private String createInsertQuery(String table, List<String> columns, List<String> inputs) {
+    private String createInsertQuery(String table, List<String> columns) {
         // INSERT 쿼리 만들기
-        // stmt or pstmt 로 할지 결정 해야 됨
         StringBuilder query = new StringBuilder("INSERT INTO ").append(table).append(" (");
         for (int i = 0; i < columns.size(); i++) {
             query.append(columns.get(i));
@@ -460,8 +632,8 @@ public class CrudPanel extends JPanel {
         // DELETE 쿼리 만들기
         StringBuilder query = new StringBuilder("DELETE FROM ").append(table);
         boolean hasCondition = false;
+
         for (int i = 0; i < columns.size(); i++) {
-            String col = columns.get(i);
             String val = inputs.get(i).trim();
             if (!val.isEmpty()) {
                 if (!hasCondition) {
@@ -470,11 +642,8 @@ public class CrudPanel extends JPanel {
                 } else {
                     query.append(" AND ");
                 }
-                if (DBUtils.INT_COLUMNS.contains(col)) {
-                    query.append(col).append(" = ").append(val);
-                } else {
-                    query.append(col).append(" = '").append(val.replace("'", "''")).append("'");
-                }
+
+                query.append(columns.get(i)).append(" = ?");
             }
         }
         return query.toString();
@@ -484,16 +653,14 @@ public class CrudPanel extends JPanel {
         // UPDATE 쿼리 만들기
         StringBuilder query = new StringBuilder("UPDATE ").append(table).append(" SET ");
         boolean hasUpdate = false;
+
         for (int i = 0; i < updateCols.size(); i++) {
             String col = updateCols.get(i);
             String val = updateVals.get(i);
+
             if (!val.isEmpty()) {
                 if (hasUpdate) query.append(", ");
-                if (DBUtils.INT_COLUMNS.contains(col)) {
-                    query.append(col).append(" = ").append(val);
-                } else {
-                    query.append(col).append(" = '").append(val.replace("'", "''")).append("'");
-                }
+                query.append(col).append(" = ?");
                 hasUpdate = true;
             }
         }
@@ -502,6 +669,7 @@ public class CrudPanel extends JPanel {
         for (int i = 0; i < condCols.size(); i++) {
             String col = condCols.get(i);
             String val = condVals.get(i);
+
             if (!val.isEmpty()) {
                 if (!hasCondition) {
                     query.append(" WHERE ");
@@ -509,14 +677,24 @@ public class CrudPanel extends JPanel {
                 } else {
                     query.append(" AND ");
                 }
-                if (DBUtils.INT_COLUMNS.contains(col)) {
-                    query.append(col).append(" = ").append(val);
-                } else {
-                    query.append(col).append(" = '").append(val.replace("'", "''")).append("'");
-                }
+
+                query.append(col).append(" = ?");
             }
         }
 
+        System.out.println(query);
         return query.toString();
+    }
+
+    private boolean isImage(String imagePath) {
+        imagePath = imagePath.toLowerCase();
+
+        for (String extension : IMAGE_EXTENSIONS) {
+            if (imagePath.endsWith(extension)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

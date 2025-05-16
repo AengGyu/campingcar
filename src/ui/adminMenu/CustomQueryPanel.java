@@ -68,7 +68,7 @@ public class CustomQueryPanel extends JPanel {
 
                 List<String> columns = new ArrayList<>();
                 for (int i = 1; i <= colCount; i++) {
-                    columns.add(meta.getColumnName(i));
+                    columns.add(meta.getColumnLabel(i));
                 }
 
                 String[] columnNames = columns.toArray(String[]::new);

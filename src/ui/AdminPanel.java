@@ -45,6 +45,7 @@ public class AdminPanel extends JPanel {
             try {
                 // DB 연결 종료
                 conn.close();
+                System.out.println("DB 연결 종료, root 커넥션 close");
                 // 메인 패널로 전환
                 frame.switchToPanel(frame.getMainPanel());
             } catch (SQLException ex) {

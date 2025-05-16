@@ -7,10 +7,11 @@ import java.awt.*;
 import java.sql.*;
 import java.time.LocalDate;
 
+// 대여 등록 다이얼로그
 public class RentCampingcarDialog extends JDialog {
 
     public RentCampingcarDialog(Frame owner, Connection conn, int campingcarId, LocalDate availableDate) {
-        // 대여하기 다이얼로그
+        // 대여 등록 다이얼로그
         super(owner, "캠핑카 대여 등록", true);
         setLayout(new BorderLayout());
 

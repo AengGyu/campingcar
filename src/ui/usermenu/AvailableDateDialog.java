@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 
+// 대여 가능 일자 다이얼로그
 public class AvailableDateDialog extends JDialog {
 
     public AvailableDateDialog(Frame owner, int campingcarId, Connection conn) {

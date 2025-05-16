@@ -42,12 +42,14 @@ public class MainFrame extends JFrame {
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 // root 계정으로 DB 연결
                 Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "1234");
+                System.out.println("DB 연결 성공, root 계정으로 로그인");
 
                 // 데이터베이스에 CAMPING 이라는 데이터베이스가 있으면 conn 에 미리 use camping 선언 해놓기
                 // 없으면 DB 초기화 하면서 DBInitializer 에서 use camping 선언 후 같은 conn 이용함
                 if (databaseExists(conn)) {
                     Statement stmt = conn.createStatement();
                     stmt.execute("USE camping");
+                    System.out.println("USE camping 실행");
                 }
                 // 관리자 로그인 패널로 전환
                 adminPanel = new AdminPanel(this, conn);
@@ -75,11 +77,13 @@ public class MainFrame extends JFrame {
 
                 // root 계정으로 DB 연결, 로그인 관련 처리까지 한 후에 user1 계정으로 conn 다시 얻어오기
                 Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "1234");
+                System.out.println("DB 연결 성공, root 계정으로 로그인");
 
                 // conn 에 미리 use camping 선언 해놓기
                 if (databaseExists(conn)) {
                     Statement stmt = conn.createStatement();
                     stmt.execute("USE camping");
+                    System.out.println("USE camping 실행");
                 }
 
                 // 일반 회원 로그인 패널로 전환
