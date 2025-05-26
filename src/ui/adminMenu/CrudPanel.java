@@ -175,11 +175,10 @@ public class CrudPanel extends JPanel {
                             }
                         } else {
                             if (DBUtils.INT_COLUMNS.contains(col)) {
+                                if (!DBUtils.isValidIntFormat(this, val, col)) return;
                                 pstmt.setInt(i + 1, Integer.parseInt(val));
                             } else if (DBUtils.DATE_COLUMNS.contains(col)) {
-                                if (!DBUtils.isValidDateFormat(this, val)) {
-                                    return;
-                                }
+                                if (!DBUtils.isValidDateFormat(this, val, col)) return;
                                 pstmt.setDate(i + 1, Date.valueOf(val));
                             } else if (DBUtils.BLOB_COLUMNS.contains(col)) {
                                 try {
@@ -324,11 +323,10 @@ public class CrudPanel extends JPanel {
                         if (val.isEmpty()) continue;
 
                         if (DBUtils.INT_COLUMNS.contains(col)) {
+                            if (!DBUtils.isValidIntFormat(this, val, col)) return;
                             pstmt.setInt(paramIdx++, Integer.parseInt(val));
                         } else if (DBUtils.DATE_COLUMNS.contains(col)) {
-                            if (!DBUtils.isValidDateFormat(this, val)) {
-                                return;
-                            }
+                            if (!DBUtils.isValidDateFormat(this, val, col)) return;
                             pstmt.setDate(paramIdx++, Date.valueOf(val));
                         } else if (DBUtils.BLOB_COLUMNS.contains(col)) {
                             try {
@@ -568,11 +566,10 @@ public class CrudPanel extends JPanel {
                     if (val.isEmpty()) continue;
 
                     if (DBUtils.INT_COLUMNS.contains(col)) {
+                        if (!DBUtils.isValidIntFormat(this, val, col)) showUpdatePanel();
                         pstmt.setInt(paramIdx++, Integer.parseInt(val));
                     } else if (DBUtils.DATE_COLUMNS.contains(col)) {
-                        if (!DBUtils.isValidDateFormat(this, val)) {
-                            showUpdatePanel();
-                        }
+                        if (!DBUtils.isValidDateFormat(this, val, col)) showUpdatePanel();
                         pstmt.setDate(paramIdx++, Date.valueOf(val));
                     } else if (DBUtils.BLOB_COLUMNS.contains(col)) {
                         try {
@@ -595,9 +592,10 @@ public class CrudPanel extends JPanel {
                     if (val.isEmpty()) continue;
 
                     if (DBUtils.INT_COLUMNS.contains(col)) {
+                        if (!DBUtils.isValidIntFormat(this, val, col)) showUpdatePanel();
                         pstmt.setInt(paramIdx++, Integer.parseInt(val));
                     } else if (DBUtils.DATE_COLUMNS.contains(col)) {
-                        if (!DBUtils.isValidDateFormat(this, val)) {
+                        if (!DBUtils.isValidDateFormat(this, val, col)) {
                             showUpdatePanel();
                         }
                         pstmt.setDate(paramIdx++, Date.valueOf(val));

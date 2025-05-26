@@ -69,12 +69,22 @@ public class DBUtils {
         MAINTENANCE_FEES = Collections.unmodifiableMap(maintenanceMap);
     }
 
-    public static boolean isValidDateFormat(Component parent, String input) {
+    public static boolean isValidIntFormat(Component parent, String input, String fieldName) {
+        try {
+            Integer.parseInt(input);
+            return true;
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(parent, "[" + fieldName + "] 필드는 정수만 입력해야 합니다.", "입력 오류", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+    }
+
+    public static boolean isValidDateFormat(Component parent, String input, String fieldName) {
         try{
             LocalDate.parse(input);
             return true;
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(parent, "날짜 형식이 잘못되었습니다. yyyy-mm-dd 형식으로 입력해주세요.", "입력 오류", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(parent, "[" + fieldName + "] 필드는 yyyy-mm-dd 형식으로 입력해야 합니다.", "입력 오류", JOptionPane.ERROR_MESSAGE);
             return false;
         }
     }

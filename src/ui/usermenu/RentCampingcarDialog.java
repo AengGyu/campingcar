@@ -46,7 +46,7 @@ public class RentCampingcarDialog extends JDialog {
                     return;
                 }
 
-                if(!DBUtils.isValidDateFormat(this, startDateField.getText().trim())) return;
+                if(!DBUtils.isValidDateFormat(this, startDateField.getText().trim(), "대여 시작일")) return;
 
                 // 대여 시작일과 대여 기간 입력값 가져오기
                 LocalDate startDate = LocalDate.parse(startDateField.getText().trim());
@@ -55,6 +55,9 @@ public class RentCampingcarDialog extends JDialog {
                     JOptionPane.showMessageDialog(this, "기간을 입력해주세요.", "입력 오류", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
+
+                if(!DBUtils.isValidIntFormat(this, periodField.getText().trim(), "대여 기간")) return;
+
                 int period = Integer.parseInt(periodField.getText().trim());
                 // 대여 종료일 계산
                 LocalDate endDate = startDate.plusDays(period);

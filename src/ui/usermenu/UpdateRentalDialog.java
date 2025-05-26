@@ -90,20 +90,23 @@ public class UpdateRentalDialog extends JDialog {
                 if (confirm != JOptionPane.YES_OPTION) return;
 
                 if (startDateField.getText().trim().isEmpty()) {
-                    JOptionPane.showMessageDialog(this, "정비 날짜를 입력해주세요.", "입력 오류", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "대여 시작일을 입력해주세요.", "입력 오류", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
 
                 // 입력값 유효성 검사
-                if (!DBUtils.isValidDateFormat(this, startDateField.getText().trim())) return;
+                if (!DBUtils.isValidDateFormat(this, startDateField.getText().trim(), "대여 시작일")) return;
 
                 // 수정하려는 대여 시작일과 대여 기간 입력값 가져오기
                 LocalDate newStart = LocalDate.parse(startDateField.getText().trim());
 
                 if (periodField.getText().trim().isEmpty()) {
-                    JOptionPane.showMessageDialog(this, "기간을 입력해주세요.", "입력 오류", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "대여 기간을 입력해주세요.", "입력 오류", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
+
+                if (!DBUtils.isValidIntFormat(this, periodField.getText().trim(), "대여 기간")) return;
+
                 int newPeriod = Integer.parseInt(periodField.getText().trim());
                 // 대여 종료일 계산
                 LocalDate newEnd = newStart.plusDays(newPeriod);

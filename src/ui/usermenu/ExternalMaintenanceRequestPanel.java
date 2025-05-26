@@ -132,8 +132,7 @@ public class ExternalMaintenanceRequestPanel extends JPanel {
                 }
 
                 // 정비 날짜 유효성 검사
-                if (!DBUtils.isValidDateFormat(this, dateField.getText().trim())) return;
-
+                if (!DBUtils.isValidDateFormat(this, dateField.getText().trim(),"정비 날짜")) return;
 
                 LocalDate maintenanceDate = LocalDate.parse(dateField.getText().trim());
 
