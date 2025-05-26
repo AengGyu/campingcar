@@ -1,5 +1,6 @@
 package ui.usermenu;
 
+import db.DBUtils;
 import db.Session;
 
 import javax.swing.*;
@@ -40,8 +41,20 @@ public class RentCampingcarDialog extends JDialog {
             // YES_OPTION 이 아닐 경우 다이얼로그 닫기
             if (confirm != JOptionPane.YES_OPTION) return;
             try {
+                if (startDateField.getText().trim().isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "정비 날짜를 입력해주세요.", "입력 오류", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                if(!DBUtils.isValidDateFormat(this, startDateField.getText().trim())) return;
+
                 // 대여 시작일과 대여 기간 입력값 가져오기
                 LocalDate startDate = LocalDate.parse(startDateField.getText().trim());
+
+                if (periodField.getText().trim().isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "기간을 입력해주세요.", "입력 오류", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
                 int period = Integer.parseInt(periodField.getText().trim());
                 // 대여 종료일 계산
                 LocalDate endDate = startDate.plusDays(period);

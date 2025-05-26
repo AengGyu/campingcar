@@ -1,5 +1,7 @@
 package ui.usermenu;
 
+import db.DBUtils;
+
 import javax.swing.*;
 import java.awt.*;
 import java.sql.*;
@@ -87,8 +89,21 @@ public class UpdateRentalDialog extends JDialog {
                 // YES_OPTION 이 아닐 경우 다이얼로그 닫기
                 if (confirm != JOptionPane.YES_OPTION) return;
 
+                if (startDateField.getText().trim().isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "정비 날짜를 입력해주세요.", "입력 오류", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                // 입력값 유효성 검사
+                if (!DBUtils.isValidDateFormat(this, startDateField.getText().trim())) return;
+
                 // 수정하려는 대여 시작일과 대여 기간 입력값 가져오기
                 LocalDate newStart = LocalDate.parse(startDateField.getText().trim());
+
+                if (periodField.getText().trim().isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "기간을 입력해주세요.", "입력 오류", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
                 int newPeriod = Integer.parseInt(periodField.getText().trim());
                 // 대여 종료일 계산
                 LocalDate newEnd = newStart.plusDays(newPeriod);

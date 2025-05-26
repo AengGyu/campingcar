@@ -131,7 +131,9 @@ public class ExternalMaintenanceRequestPanel extends JPanel {
                     return;
                 }
 
-                // 유효성 검사 오류 메세지 띄우기, 날짜 말고 다른 거 입력하면 오류 로그만 남음
+                // 정비 날짜 유효성 검사
+                if (!DBUtils.isValidDateFormat(this, dateField.getText().trim())) return;
+
 
                 LocalDate maintenanceDate = LocalDate.parse(dateField.getText().trim());
 

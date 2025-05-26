@@ -1,6 +1,10 @@
 package db;
 
+import javax.swing.*;
+import java.awt.*;
+import java.time.LocalDate;
 import java.util.*;
+import java.util.List;
 
 public class DBUtils {
     public static final Map<String, List<String>> TABLE_COLUMNS; // 각 테이블의 속성을 저장한 map
@@ -63,6 +67,16 @@ public class DBUtils {
         maintenanceMap.put("오일 누유 점검", 75000);
         maintenanceMap.put("샤워실 수압 문제", 65000);
         MAINTENANCE_FEES = Collections.unmodifiableMap(maintenanceMap);
+    }
+
+    public static boolean isValidDateFormat(Component parent, String input) {
+        try{
+            LocalDate.parse(input);
+            return true;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(parent, "날짜 형식이 잘못되었습니다. yyyy-mm-dd 형식으로 입력해주세요.", "입력 오류", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
     }
 }
 

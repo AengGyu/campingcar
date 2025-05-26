@@ -177,6 +177,9 @@ public class CrudPanel extends JPanel {
                             if (DBUtils.INT_COLUMNS.contains(col)) {
                                 pstmt.setInt(i + 1, Integer.parseInt(val));
                             } else if (DBUtils.DATE_COLUMNS.contains(col)) {
+                                if (!DBUtils.isValidDateFormat(this, val)) {
+                                    return;
+                                }
                                 pstmt.setDate(i + 1, Date.valueOf(val));
                             } else if (DBUtils.BLOB_COLUMNS.contains(col)) {
                                 try {
@@ -323,6 +326,9 @@ public class CrudPanel extends JPanel {
                         if (DBUtils.INT_COLUMNS.contains(col)) {
                             pstmt.setInt(paramIdx++, Integer.parseInt(val));
                         } else if (DBUtils.DATE_COLUMNS.contains(col)) {
+                            if (!DBUtils.isValidDateFormat(this, val)) {
+                                return;
+                            }
                             pstmt.setDate(paramIdx++, Date.valueOf(val));
                         } else if (DBUtils.BLOB_COLUMNS.contains(col)) {
                             try {
@@ -564,6 +570,9 @@ public class CrudPanel extends JPanel {
                     if (DBUtils.INT_COLUMNS.contains(col)) {
                         pstmt.setInt(paramIdx++, Integer.parseInt(val));
                     } else if (DBUtils.DATE_COLUMNS.contains(col)) {
+                        if (!DBUtils.isValidDateFormat(this, val)) {
+                            showUpdatePanel();
+                        }
                         pstmt.setDate(paramIdx++, Date.valueOf(val));
                     } else if (DBUtils.BLOB_COLUMNS.contains(col)) {
                         try {
@@ -588,6 +597,9 @@ public class CrudPanel extends JPanel {
                     if (DBUtils.INT_COLUMNS.contains(col)) {
                         pstmt.setInt(paramIdx++, Integer.parseInt(val));
                     } else if (DBUtils.DATE_COLUMNS.contains(col)) {
+                        if (!DBUtils.isValidDateFormat(this, val)) {
+                            showUpdatePanel();
+                        }
                         pstmt.setDate(paramIdx++, Date.valueOf(val));
                     } else if (DBUtils.BLOB_COLUMNS.contains(col)) {
                         try {
