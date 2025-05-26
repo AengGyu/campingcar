@@ -124,7 +124,7 @@ public class ShowTablePanel extends JPanel {
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "조회 실패: " + ex.getMessage());
+                JOptionPane.showMessageDialog(this, "다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
             }
         });
     }
@@ -151,7 +151,7 @@ public class ShowTablePanel extends JPanel {
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "이미지 로딩 실패: " + ex.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

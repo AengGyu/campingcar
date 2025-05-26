@@ -50,7 +50,7 @@ public class AdminPanel extends JPanel {
                 frame.switchToPanel(frame.getMainPanel());
             } catch (SQLException ex) {
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "로그아웃 실패: " + ex.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
             }
         });
 

@@ -52,7 +52,7 @@ public class AvailableDateDialog extends JDialog {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "대여 가능 날짜 조회 실패: " + e.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
         }
 
         // 대여하기 버튼, 취소 버튼 생성

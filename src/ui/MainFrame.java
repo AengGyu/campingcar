@@ -55,10 +55,10 @@ public class MainFrame extends JFrame {
                 adminPanel = new AdminPanel(this, conn);
                 switchToPanel(adminPanel);
             } catch (ClassNotFoundException ex) {
-                System.out.println("JDBC 드라이버 로드 오류");
+                JOptionPane.showMessageDialog(this, "다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
             } catch (SQLException ex) {
-                System.out.println("SQL 실행오류");
+                JOptionPane.showMessageDialog(this, "다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
             }
         });
@@ -90,7 +90,7 @@ public class MainFrame extends JFrame {
                 userLoginPanel = new UserLoginPanel(this, conn);
                 switchToPanel(userLoginPanel);
             } catch (SQLException ex) {
-                System.out.println("SQL 실행오류");
+                JOptionPane.showMessageDialog(this, "다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
             }
         });

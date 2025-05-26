@@ -198,7 +198,7 @@ public class CrudPanel extends JPanel {
                     JOptionPane.showMessageDialog(this, "데이터 삽입 성공");
                     showInsertPanel();
                 } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(this, "삽입 실패: " + ex.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
                     ex.printStackTrace();
                 }
             });
@@ -343,7 +343,7 @@ public class CrudPanel extends JPanel {
                     showDeletePanel();
                 } catch (SQLException ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(this, "삭제 실패: " + ex.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
                 }
             });
 
@@ -607,7 +607,7 @@ public class CrudPanel extends JPanel {
                 showUpdatePanel();
             } catch (SQLException ex) {
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "수정 실패: " + ex.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
             }
         });
     }

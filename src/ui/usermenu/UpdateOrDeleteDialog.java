@@ -46,7 +46,7 @@ public class UpdateOrDeleteDialog extends JDialog {
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "수정 가능 여부 확인 중 오류 발생: " + ex.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             dispose();
@@ -71,11 +71,11 @@ public class UpdateOrDeleteDialog extends JDialog {
                         JOptionPane.showMessageDialog(this, "삭제되었습니다.");
                         dispose();
                     } else{
-                        JOptionPane.showMessageDialog(this, "삭제 실패 : 해당 항목을 찾을 수 없습니다.");
+                        JOptionPane.showMessageDialog(this, "다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
                     }
                 } catch (SQLException ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(this, "삭제 실패: " + ex.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });

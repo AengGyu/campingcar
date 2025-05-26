@@ -39,7 +39,7 @@ public class UserPanel extends JPanel {
         contentPanel.add(new JLabel("왼쪽 메뉴를 선택하세요"));
 
         showCampingcarBtn.addActionListener(e-> setContent(new ShowCampingcarPanel(conn)));
-        rentInfo.addActionListener(e-> setContent(new CheckRentalPanel(conn)));
+        rentInfo.addActionListener(e-> setContent(new CheckRentalPanel(conn, this)));
         requestMaintenance.addActionListener(e -> setContent(new ExternalMaintenanceRequestPanel(conn)));
         logout.addActionListener(e->{
             // 로그아웃 처리
@@ -51,7 +51,7 @@ public class UserPanel extends JPanel {
                 frame.switchToPanel(frame.getMainPanel());
             } catch (SQLException ex) {
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "로그아웃 실패: " + ex.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -59,7 +59,7 @@ public class UserPanel extends JPanel {
         add(contentPanel,BorderLayout.CENTER);
     }
 
-    private void setContent(JPanel panel) {
+    public void setContent(JPanel panel) {
         // 기존 패널을 제거하고 새로운 패널을 추가
         contentPanel.removeAll();
         contentPanel.add(panel);

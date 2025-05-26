@@ -25,7 +25,7 @@ public class DbInitPanel extends JPanel {
 
                     JOptionPane.showMessageDialog(this, "초기화 완료");
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(this, "오류 발생");
+                    JOptionPane.showMessageDialog(this, "다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
                     ex.printStackTrace();
                 }
             }

@@ -54,7 +54,7 @@ public class CustomQueryPanel extends JPanel {
 
             // 쿼리 시작 부분이 SELECT인지 확인
             if (!query.toLowerCase().startsWith("select")) {
-                JOptionPane.showMessageDialog(this, "SELECT 문만 실행 가능합니다.", "오류", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(CustomQueryPanel.this, "SELECT 문만 실행 가능합니다.", "오류", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
@@ -153,7 +153,7 @@ public class CustomQueryPanel extends JPanel {
 
             } catch (SQLException ex) {
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "쿼리 실행 실패: " + ex.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
             }
         });
     }

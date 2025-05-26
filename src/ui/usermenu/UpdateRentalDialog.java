@@ -37,7 +37,7 @@ public class UpdateRentalDialog extends JDialog {
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "캠핑카 목록을 불러오지 못했습니다.");
+            JOptionPane.showMessageDialog(this, "다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
             dispose();
             return;
         }
@@ -72,7 +72,7 @@ public class UpdateRentalDialog extends JDialog {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "기존 대여 정보를 불러오는 데 실패했습니다.");
+            JOptionPane.showMessageDialog(this, "다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
             dispose();
             return;
         }
@@ -150,7 +150,7 @@ public class UpdateRentalDialog extends JDialog {
 
             } catch (Exception ex) {
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "오류: " + ex.getMessage());
+                JOptionPane.showMessageDialog(this, "다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
             }
         });
 

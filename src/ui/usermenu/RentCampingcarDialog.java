@@ -88,7 +88,7 @@ public class RentCampingcarDialog extends JDialog {
                     dailyFee = rs.getInt("rental_fee");
                     companyId = rs.getInt("company_id");
                 } else {
-                    JOptionPane.showMessageDialog(this, "요금 정보를 불러오지 못했습니다.");
+                    JOptionPane.showMessageDialog(this, "다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
@@ -121,7 +121,7 @@ public class RentCampingcarDialog extends JDialog {
             } catch (Exception ex) {
                 // 유효성 검사 포함해야 해서 Exception 으로 RuntimeException 도 같이 잡기
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "오류: " + ex.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
             }
         });
 

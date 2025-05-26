@@ -134,9 +134,10 @@ public class ExternalMaintenanceRequestPanel extends JPanel {
                 // 유효성 검사 오류 메세지 띄우기, 날짜 말고 다른 거 입력하면 오류 로그만 남음
 
                 LocalDate maintenanceDate = LocalDate.parse(dateField.getText().trim());
-                // 정비 날짜가 오늘 이후여야 함
-                if (!maintenanceDate.isAfter(LocalDate.now())) {
-                    JOptionPane.showMessageDialog(this, "정비 날짜는 오늘 이후여야 합니다.");
+
+                // 정비 날짜가 오늘이거나 오늘 이후여야 함
+                if (maintenanceDate.isBefore(LocalDate.now())) {
+                    JOptionPane.showMessageDialog(this, "정비 날짜는 오늘 이후여야 합니다.", "오류", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 

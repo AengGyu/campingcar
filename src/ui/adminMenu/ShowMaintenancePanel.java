@@ -62,7 +62,7 @@ public class ShowMaintenancePanel extends JPanel {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "캠핑카 목록 불러오기 실패: " + e.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -117,7 +117,7 @@ public class ShowMaintenancePanel extends JPanel {
             }
 
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "정비 내역 조회 실패: " + e.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
 
@@ -191,7 +191,7 @@ public class ShowMaintenancePanel extends JPanel {
             }
 
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "외부 정비 내역 조회 실패: " + e.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
 
@@ -235,7 +235,7 @@ public class ShowMaintenancePanel extends JPanel {
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
-            partInfo.setText("DB 오류: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
         }
 
         dialog.add(new JScrollPane(partInfo), BorderLayout.CENTER);
