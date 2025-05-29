@@ -298,7 +298,7 @@ public class CrudPanel extends JPanel {
                 }
             }
 
-            JButton deleteBtn = new JButton("삭제 실행");
+            JButton deleteBtn = new JButton("삭제하기");
             deleteBtn.setPreferredSize(new Dimension(120, 35));
 
             // 삭제 실행 버튼 클릭 시

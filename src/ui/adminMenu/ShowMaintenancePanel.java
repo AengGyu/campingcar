@@ -111,9 +111,8 @@ public class ShowMaintenancePanel extends JPanel {
             }
             // 정비 내역이 없을 경우 "정비 내역 없음" 메시지 표시
             if (!hasData) {
-                JLabel noDataLabel = new JLabel("정비 내역 없음");
-                noDataLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-                contentPanel.add(noDataLabel);
+                JOptionPane.showMessageDialog(this, "자체 정비 내역이 없습니다.", "정보 없음", JOptionPane.INFORMATION_MESSAGE);
+                return;
             }
 
         } catch (SQLException e) {
@@ -185,9 +184,8 @@ public class ShowMaintenancePanel extends JPanel {
 
             // 정비 내역이 없을 경우 "정비 내역 없음" 메시지 표시
             if (!hasData) {
-                JLabel noDataLabel = new JLabel("정비 내역 없음");
-                noDataLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-                contentPanel.add(noDataLabel);
+                JOptionPane.showMessageDialog(this, "외부 정비 내역이 없습니다.", "정보 없음", JOptionPane.INFORMATION_MESSAGE);
+                return;
             }
 
         } catch (SQLException e) {
