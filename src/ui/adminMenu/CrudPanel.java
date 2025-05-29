@@ -115,7 +115,9 @@ public class CrudPanel extends JPanel {
                             }
 
                             // 레이블에 파일 경로 표시
-                            imageLabel.setText(filePath);
+                            String shortPath = filePath.length() > 30 ? "..." + filePath.substring(filePath.length() - 30) : filePath;
+                            imageLabel.setText(shortPath);
+                            imageLabel.setToolTipText(filePath);
                             imagePathField.setText(filePath);
                         }
                     });
@@ -277,7 +279,10 @@ public class CrudPanel extends JPanel {
                                 JOptionPane.showMessageDialog(this, "이미지 파일만 선택할 수 있습니다.", "오류", JOptionPane.ERROR_MESSAGE);
                                 return;
                             }
-                            imageLabel.setText(filePath);
+
+                            String shortPath = filePath.length() > 30 ? "..." + filePath.substring(filePath.length() - 30) : filePath;
+                            imageLabel.setText(shortPath);
+                            imageLabel.setToolTipText(filePath);
                             imagePathField.setText(filePath);
                         }
                     });
@@ -425,7 +430,9 @@ public class CrudPanel extends JPanel {
                             }
 
                             // 레이블에 파일 경로 표시
-                            imageLabel.setText(filePath);
+                            String shortPath = filePath.length() > 30 ? "..." + filePath.substring(filePath.length() - 30) : filePath;
+                            imageLabel.setText(shortPath);
+                            imageLabel.setToolTipText(filePath);
                             imagePathField.setText(filePath);
                         }
                     });
@@ -505,7 +512,9 @@ public class CrudPanel extends JPanel {
                         }
 
                         // 레이블에 파일 경로 표시
-                        imageLabel.setText(filePath);
+                        String shortPath = filePath.length() > 30 ? "..." + filePath.substring(filePath.length() - 30) : filePath;
+                        imageLabel.setText(shortPath);
+                        imageLabel.setToolTipText(filePath);
                         imagePathField.setText(filePath);
                     }
                 });
