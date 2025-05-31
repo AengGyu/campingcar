@@ -136,7 +136,12 @@ public class CrudPanel extends JPanel {
             }
 
             // 빈 줄 추가
-            formPanel.add(new JLabel());
+//            formPanel.add(new JLabel());
+            // 뒤로가기 버튼 추가
+            JButton backBtn = new JButton("뒤로가기");
+            backBtn.setPreferredSize(new Dimension(120, 35));
+            backBtn.addActionListener(e1 -> showInsertPanel());
+            formPanel.add(backBtn);
             // 실행 버튼 만들기
             JButton submitBtn = new JButton("실행");
             submitBtn.setPreferredSize(new Dimension(120, 35));
@@ -356,7 +361,13 @@ public class CrudPanel extends JPanel {
                 }
             });
 
-            formPanel.add(new JLabel());
+            // 뒤로가기 버튼 추가
+            JButton backBtn = new JButton("뒤로가기");
+            backBtn.setPreferredSize(new Dimension(120, 35));
+            backBtn.addActionListener(e1 -> showDeletePanel());
+            formPanel.add(backBtn);
+
+            // 삭제 버튼 추가
             formPanel.add(deleteBtn);
 
             contentPanel.removeAll();
@@ -449,8 +460,14 @@ public class CrudPanel extends JPanel {
             }
 
             JButton nextBtn = new JButton("수정값 입력하기");
-            nextBtn.setPreferredSize(new Dimension(150, 35));
-            conditionPanel.add(new JLabel());
+            nextBtn.setPreferredSize(new Dimension(120, 35));
+            // 뒤로가기 버튼 추가
+            JButton backBtn = new JButton("뒤로가기");
+            backBtn.setPreferredSize(new Dimension(120, 35));
+            backBtn.addActionListener(e1 -> showUpdatePanel());
+            conditionPanel.add(backBtn);
+
+            // 수정값 입력하기 버튼 추가
             conditionPanel.add(nextBtn);
 
             contentPanel.removeAll();
@@ -532,7 +549,13 @@ public class CrudPanel extends JPanel {
 
         JButton updateBtn = new JButton("수정하기");
         updateBtn.setPreferredSize(new Dimension(120, 35));
-        formPanel.add(new JLabel());
+        // 뒤로가기 버튼 추가
+        JButton backBtn = new JButton("뒤로가기");
+        backBtn.setPreferredSize(new Dimension(120, 35));
+        backBtn.addActionListener(e1 -> showUpdatePanel());
+        formPanel.add(backBtn);
+
+        // 수정하기 버튼 추가
         formPanel.add(updateBtn);
 
         JLabel label = new JLabel("[" + selectedTable + "] 테이블 수정할 값 입력", SwingConstants.CENTER);

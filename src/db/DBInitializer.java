@@ -151,6 +151,14 @@ public class DBInitializer {
 
             System.out.println("DB 초기화 완료");
 
+            stmt.execute("SET GLOBAL validate_password.policy = LOW");
+            stmt.execute("SET GLOBAL validate_password.length = 4");
+            stmt.execute("SET GLOBAL validate_password.mixed_case_count = 0");
+            stmt.execute("SET GLOBAL validate_password.number_count = 0");
+            stmt.execute("SET GLOBAL validate_password.special_char_count = 0");
+
+            stmt.execute("DROP USER IF EXISTS 'user1'@'localhost'");
+
             stmt.execute("CREATE USER IF NOT EXISTS 'user1'@'localhost' IDENTIFIED BY 'user1'");
             stmt.execute("GRANT SELECT, INSERT, UPDATE ON camping.camping_car TO 'user1'@'localhost'");
             stmt.execute("GRANT SELECT, INSERT, UPDATE, DELETE ON camping.rental TO 'user1'@'localhost'");
@@ -280,7 +288,17 @@ public class DBInitializer {
                 "INSERT INTO rental (rental_start, rental_period, fee, deadline, additional_detail, additional_fee, campingcar_id, company_id, driver_license) VALUES ('2024-02-15', 1, 160000, '2024-03-15', NULL, NULL, 20, 8, '32-16-901234-56')",
                 "INSERT INTO rental (rental_start, rental_period, fee, deadline, additional_detail, additional_fee, campingcar_id, company_id, driver_license) VALUES ('2024-02-10', 2, 280000, '2024-03-10', NULL, NULL, 3, 3, '33-15-012345-67')",
                 "INSERT INTO rental (rental_start, rental_period, fee, deadline, additional_detail, additional_fee, campingcar_id, company_id, driver_license) VALUES ('2024-02-05', 2, 270000, '2024-03-05', NULL, NULL, 24, 11, '34-14-123456-78')",
-                "INSERT INTO rental (rental_start, rental_period, fee, deadline, additional_detail, additional_fee, campingcar_id, company_id, driver_license) VALUES ('2024-02-20', 3, 400000, '2024-03-20', '와이파이 포함', 8000, 5, 5, '14-13-234567-89')"
+                "INSERT INTO rental (rental_start, rental_period, fee, deadline, additional_detail, additional_fee, campingcar_id, company_id, driver_license) VALUES ('2024-02-20', 3, 400000, '2024-03-20', '와이파이 포함', 8000, 5, 5, '14-13-234567-89')",
+                "INSERT INTO rental (rental_start, rental_period, fee, deadline, additional_detail, additional_fee, campingcar_id, company_id, driver_license) VALUES ('2024-03-01', 3, 450000, '2024-04-01', '프리미엄 보험 포함', 20000, 2, 2, '11-24-123456-78')",
+                "INSERT INTO rental (rental_start, rental_period, fee, deadline, additional_detail, additional_fee, campingcar_id, company_id, driver_license) VALUES ('2024-03-05', 2, 380000, '2024-04-05', NULL, NULL, 4, 4, '26-23-234567-89')",
+                "INSERT INTO rental (rental_start, rental_period, fee, deadline, additional_detail, additional_fee, campingcar_id, company_id, driver_license) VALUES ('2024-03-10', 4, 600000, '2024-04-10', '캠핑 장비 세트 포함', 35000, 6, 6, '27-22-345678-90')",
+                "INSERT INTO rental (rental_start, rental_period, fee, deadline, additional_detail, additional_fee, campingcar_id, company_id, driver_license) VALUES ('2024-03-15', 2, 400000, '2024-04-15', '와이파이 포함', 10000, 7, 7, '28-21-456789-01')",
+                "INSERT INTO rental (rental_start, rental_period, fee, deadline, additional_detail, additional_fee, campingcar_id, company_id, driver_license) VALUES ('2024-04-01', 3, 480000, '2024-05-01', '프리미엄 보험 포함', 25000, 9, 9, '29-20-567890-12')",
+                "INSERT INTO rental (rental_start, rental_period, fee, deadline, additional_detail, additional_fee, campingcar_id, company_id, driver_license) VALUES ('2024-04-05', 2, 360000, '2024-05-05', '내비게이션 포함', 15000, 11, 11, '30-19-678901-23')",
+                "INSERT INTO rental (rental_start, rental_period, fee, deadline, additional_detail, additional_fee, campingcar_id, company_id, driver_license) VALUES ('2024-04-10', 4, 550000, '2024-05-10', NULL, NULL, 13, 1, '31-18-789012-34')",
+                "INSERT INTO rental (rental_start, rental_period, fee, deadline, additional_detail, additional_fee, campingcar_id, company_id, driver_license) VALUES ('2024-04-15', 2, 390000, '2024-05-15', '와이파이 포함', 10000, 15, 3, '13-17-890123-45')",
+                "INSERT INTO rental (rental_start, rental_period, fee, deadline, additional_detail, additional_fee, campingcar_id, company_id, driver_license) VALUES ('2024-04-20', 3, 460000, '2024-05-20', NULL, NULL, 17, 5, '32-16-901234-56')",
+                "INSERT INTO rental (rental_start, rental_period, fee, deadline, additional_detail, additional_fee, campingcar_id, company_id, driver_license) VALUES ('2025-05-31', 60, 420000, '2025-06-30', '캠핑 장비 포함', 20000, 19, 7, '11-24-123456-78')"
         };
 
         String[] externalShop = {
@@ -310,7 +328,13 @@ public class DBInitializer {
                 "INSERT INTO external_maintenance_request (maintenance_detail, maintenance_date, fee, deadline, additional_detail, campingcar_id, shop_id, company_id, driver_license) VALUES ('전조등 교체', '2024-06-10', 55000, '2024-07-10', 'LED로 업그레이드', 20, 8, 8, '32-16-901234-56')",
                 "INSERT INTO external_maintenance_request (maintenance_detail, maintenance_date, fee, deadline, additional_detail, campingcar_id, shop_id, company_id, driver_license) VALUES ('배터리 점검', '2024-06-04', 60000, '2024-07-04', NULL, 3, 3, 3, '33-15-012345-67')",
                 "INSERT INTO external_maintenance_request (maintenance_detail, maintenance_date, fee, deadline, additional_detail, campingcar_id, shop_id, company_id, driver_license) VALUES ('오일 누유 점검', '2024-06-02', 75000, '2024-07-02', NULL, 24, 11, 11, '34-14-123456-78')",
-                "INSERT INTO external_maintenance_request (maintenance_detail, maintenance_date, fee, deadline, additional_detail, campingcar_id, shop_id, company_id, driver_license) VALUES ('샤워실 수압 문제', '2024-06-24', 65000, '2024-07-24', '배관 수리 포함', 5, 5, 5, '14-13-234567-89')"
+                "INSERT INTO external_maintenance_request (maintenance_detail, maintenance_date, fee, deadline, additional_detail, campingcar_id, shop_id, company_id, driver_license) VALUES ('샤워실 수압 문제', '2024-06-24', 65000, '2024-07-24', '배관 수리 포함', 5, 5, 5, '14-13-234567-89')",
+                "INSERT INTO external_maintenance_request (maintenance_detail, maintenance_date, fee, deadline, additional_detail, campingcar_id, shop_id, company_id, driver_license) VALUES ('타이어 교체', '2024-07-01', 100000, '2024-08-01', '고급 타이어 사용', 9, 9, 9, '29-20-567890-12')",
+                "INSERT INTO external_maintenance_request (maintenance_detail, maintenance_date, fee, deadline, additional_detail, campingcar_id, shop_id, company_id, driver_license) VALUES ('엔진 점검', '2024-07-05', 80000, '2024-08-05', NULL, 11, 11, 11, '30-19-678901-23')",
+                "INSERT INTO external_maintenance_request (maintenance_detail, maintenance_date, fee, deadline, additional_detail, campingcar_id, shop_id, company_id, driver_license) VALUES ('외부 도색', '2024-07-10', 120000, '2024-08-10', '스크래치 복원', 13, 1, 1, '31-18-789012-34')",
+                "INSERT INTO external_maintenance_request (maintenance_detail, maintenance_date, fee, deadline, additional_detail, campingcar_id, shop_id, company_id, driver_license) VALUES ('브레이크 점검', '2024-07-15', 70000, '2024-08-15', NULL, 15, 3, 3, '13-17-890123-45')",
+                "INSERT INTO external_maintenance_request (maintenance_detail, maintenance_date, fee, deadline, additional_detail, campingcar_id, shop_id, company_id, driver_license) VALUES ('냉각수 교체', '2024-07-20', 60000, '2024-08-20', '프리미엄 냉각수', 17, 5, 5, '32-16-901234-56')",
+                "INSERT INTO external_maintenance_request (maintenance_detail, maintenance_date, fee, deadline, additional_detail, campingcar_id, shop_id, company_id, driver_license) VALUES ('에어컨 수리', '2024-07-25', 90000, '2024-08-25', NULL, 19, 7, 7, '33-15-012345-67')"
         };
 
         try {
